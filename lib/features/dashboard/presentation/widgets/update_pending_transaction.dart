@@ -1,0 +1,104 @@
+import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class UpdatePendingTransaction extends StatelessWidget {
+  const UpdatePendingTransaction({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Ready to pay?',
+              style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white54),
+            ),
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _timeItem(context, 'Date', '21 Sept 2021'),
+                _timeItem(context, 'Time', '4:00 PM'),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        Text(
+          'Next Sent your Money to your AUD account. We\'ll get started to  your transfer the moment to receive your money.',
+          style: Theme.of(context).textTheme.caption?.copyWith(color: Colors.white),
+        ),
+        SizedBox(height: 12.h),
+        _dottedLine(),
+        SizedBox(height: 12.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _button(context: context, title: 'I\'ve paid now', backgroundColor: const Color(0xFF6E6F6F), borderColor: const Color(0xFF282A3C)),
+            _button(context: context, title: 'Choose how to pay', backgroundColor: const Color(0xFF000812), borderColor: Colors.transparent),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        Align(
+          alignment: Alignment.center,
+          child: _button(
+            context: context,
+            title: 'Cancel Transfer',
+            backgroundColor: Colors.transparent,
+            borderColor: const Color(0xFFD60101),
+            textColor: const Color(0xFFD60101),
+          ),
+        ),
+        SizedBox(height: 12.h),
+      ],
+    );
+  }
+
+  Widget _dottedLine() {
+    return const DottedLine(
+      direction: Axis.horizontal,
+      lineLength: double.infinity,
+      lineThickness: 2.0,
+      dashLength: 8.0,
+      dashColor: Colors.black,
+      dashRadius: 0.0,
+      dashGapLength: 4.0,
+      dashGapColor: Colors.transparent,
+    );
+  }
+
+  Widget _button(
+      {required BuildContext context, required String title, Function()? onTap, required Color backgroundColor, required Color borderColor, Color textColor = Colors.white}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: ShapeDecoration(
+          shape: StadiumBorder(side: BorderSide(color: borderColor)),
+          color: backgroundColor,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        child: Text(title, style: Theme.of(context).textTheme.caption?.copyWith(color: textColor)),
+      ),
+    );
+  }
+
+  Widget _timeItem(BuildContext context, String title, String details) {
+    return Row(
+      children: [
+        Text(
+          '$title: ',
+          style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 11.sp, fontWeight: FontWeight.w600),
+        ),
+        Text(
+          details,
+          style: Theme.of(context).textTheme.caption?.copyWith(fontSize: 11.sp, fontWeight: FontWeight.w600),
+        )
+      ],
+    );
+  }
+}

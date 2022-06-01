@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16.932" height="17" viewBox="0 0 16.932 17">
+  <defs>
+    <linearGradient id="linear-gradient" x1="-20.725" y1="-17.863" x2="-19.724" y2="-17.863" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#939598"/>
+      <stop offset="0.13" stop-color="#a8aaac"/>
+      <stop offset="0.39" stop-color="#cecfd0"/>
+      <stop offset="0.63" stop-color="#e9e9ea"/>
+      <stop offset="0.84" stop-color="#f9f9f9"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="-32.007" y1="-9.418" x2="-31.31" y2="-8.721" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#999"/>
+      <stop offset="0.1" stop-color="#a8a8a8"/>
+      <stop offset="0.36" stop-color="#cecece"/>
+      <stop offset="0.61" stop-color="#e9e9e9"/>
+      <stop offset="0.83" stop-color="#f9f9f9"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+  </defs>
+  <g id="receivercountry" style="isolation: isolate">
+    <g id="Layer_2" data-name="Layer 2" transform="translate(0 0)">
+      <g id="Layer_1" data-name="Layer 1">
+        <path id="Path_6" data-name="Path 6" d="M0,7.714a8.4,8.4,0,0,0,4.36,7.479V.33A8.466,8.466,0,0,0,0,7.714Z" transform="translate(0 0.725)" fill="#fff"/>
+        <path id="Path_7" data-name="Path 7" d="M5.444,0A8.434,8.434,0,0,0,1.37,1.05V15.913A8.116,8.116,0,0,0,5.444,17a8.5,8.5,0,1,0,0-17Z" transform="translate(2.991 0.005)" fill="#00401c"/>
+        <path id="Path_8" data-name="Path 8" d="M7.538,8.4A3.946,3.946,0,0,1,5.183,1.33,4.36,4.36,0,0,0,2,5.436a4.3,4.3,0,0,0,8.243,1.75A3.946,3.946,0,0,1,7.538,8.4Z" transform="translate(4.366 2.908)" fill="#fff"/>
+        <path id="Path_9" data-name="Path 9" d="M6.293,3.669,5.275,3.446l-.541.891-.1-1.05L3.62,3.1l.955-.446L4.447,1.6l.732.8.955-.414-.541.891Z" transform="translate(7.902 3.497)" fill="#fff"/>
+        <g id="Group_3" data-name="Group 3" transform="translate(0.017)" style="mix-blend-mode: multiply;isolation: isolate">
+          <path id="Path_10" data-name="Path 10" d="M14.406,2.486A8.4,8.4,0,1,1,8.439,0a8.434,8.434,0,0,1,5.967,2.487Z" transform="translate(-0.005 0.002)" fill="url(#linear-gradient)"/>
+          <path id="Path_11" data-name="Path 11" d="M8.107.15A7.988,7.988,0,1,1,.15,8.107,7.988,7.988,0,0,1,8.107.15Z" transform="translate(0.311 0.332)" fill="url(#linear-gradient-2)"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="Group_26070" data-name="Group 26070" transform="translate(-42 -631)">
+    <g id="termncondition" transform="translate(44.035 633.035)">
+      <path id="Path_38241" data-name="Path 38241" d="M33.6,18.657a.332.332,0,0,0,.332-.332v-.664A1.663,1.663,0,0,0,32.276,16H20.318a1.663,1.663,0,0,0-1.661,1.661V32.608h.664V17.661a1,1,0,0,1,1-1h10.63a1.652,1.652,0,0,0-.333,1V34.269a1,1,0,0,1-1.993,0V33.6a.332.332,0,0,0-.332-.332H16.332A.332.332,0,0,0,16,33.6v.664a1.663,1.663,0,0,0,1.661,1.661H29.619a1.663,1.663,0,0,0,1.661-1.661V18.657ZM17.661,35.265a1,1,0,0,1-1-1v-.332H27.958v.332a1.652,1.652,0,0,0,.333,1Zm14.615-18.6a1,1,0,0,1,1,1v.332H31.279v-.332a1,1,0,0,1,1-1Z" transform="translate(-16 -16)" fill="#000812"/>
+      <path id="Path_38242" data-name="Path 38242" d="M184,57.993a.848.848,0,0,0,.335.687,1.666,1.666,0,0,0,3.315,0,.87.87,0,0,0,0-1.373,1.666,1.666,0,0,0-3.315,0A.848.848,0,0,0,184,57.993Zm.818-.193a.332.332,0,0,0,.208-.5.2.2,0,0,1,.273-.273.332.332,0,0,0,.5-.208.2.2,0,0,1,.386,0,.332.332,0,0,0,.5.208.2.2,0,0,1,.273.273.332.332,0,0,0,.208.5.2.2,0,0,1,0,.386.332.332,0,0,0-.208.5.2.2,0,0,1-.273.273.332.332,0,0,0-.5.208.2.2,0,0,1-.386,0,.332.332,0,0,0-.5-.208.2.2,0,0,1-.273-.273.332.332,0,0,0-.208-.5.2.2,0,0,1,0-.386Z" transform="translate(-177.023 -54.339)" fill="#000812"/>
+      <path id="Path_38243" data-name="Path 38243" d="M192,200h3.322v.664H192Z" transform="translate(-184.693 -192.36)" fill="#000812"/>
+      <path id="Path_38244" data-name="Path 38244" d="M216,168h3.322v.664H216Z" transform="translate(-207.696 -161.689)" fill="#000812"/>
+      <path id="Path_38245" data-name="Path 38245" d="M168,168h1.329v.664H168Z" transform="translate(-161.689 -161.689)" fill="#000812"/>
+      <path id="Path_38246" data-name="Path 38246" d="M152,240h7.972v.664H152Z" transform="translate(-146.353 -230.7)" fill="#000812"/>
+      <path id="Path_38247" data-name="Path 38247" d="M120,240h.664v.664H120Z" transform="translate(-115.682 -230.7)" fill="#000812"/>
+      <path id="Path_38248" data-name="Path 38248" d="M152,272h5.315v.664H152Z" transform="translate(-146.353 -261.371)" fill="#000812"/>
+      <path id="Path_38249" data-name="Path 38249" d="M296,272h1.993v.664H296Z" transform="translate(-284.374 -261.371)" fill="#000812"/>
+      <path id="Path_38250" data-name="Path 38250" d="M152,304h7.972v.664H152Z" transform="translate(-146.353 -292.042)" fill="#000812"/>
+      <path id="Path_38251" data-name="Path 38251" d="M120,304h.664v.664H120Z" transform="translate(-115.682 -292.042)" fill="#000812"/>
+      <path id="Path_38252" data-name="Path 38252" d="M152,336h1.993v.664H152Z" transform="translate(-146.353 -322.714)" fill="#000812"/>
+      <path id="Path_38253" data-name="Path 38253" d="M216,336h5.315v.664H216Z" transform="translate(-207.696 -322.714)" fill="#000812"/>
+      <path id="Path_38254" data-name="Path 38254" d="M152,368h5.315v.664H152Z" transform="translate(-146.353 -353.385)" fill="#000812"/>
+      <path id="Path_38255" data-name="Path 38255" d="M120,368h.664v.664H120Z" transform="translate(-115.682 -353.385)" fill="#000812"/>
+      <path id="Path_38256" data-name="Path 38256" d="M152,400h7.972v.664H152Z" transform="translate(-146.353 -384.056)" fill="#000812"/>
+      <path id="Path_38257" data-name="Path 38257" d="M296,368h1.993v.664H296Z" transform="translate(-284.374 -353.385)" fill="#000812"/>
+      <path id="Path_38258" data-name="Path 38258" d="M402.989,113.329h-.332a1.329,1.329,0,0,0-2.657,0v10.629a.33.33,0,0,0,.035.148h0l1,1.993a.332.332,0,0,0,.594,0l1-1.993h0a.33.33,0,0,0,.035-.148v-9.965h.332a.333.333,0,0,1,.332.332v3.654h.664v-3.654A1,1,0,0,0,402.989,113.329Zm-1.661-.664a.665.665,0,0,1,.664.664h-1.329A.665.665,0,0,1,401.329,112.664Zm.664,10.961h-1.329v-4.982h1.329Zm0-5.647h-1.329v-.664h1.329Zm-.664,7.229-.459-.918h.918Zm.664-8.558h-1.329v-2.657h1.329Z" transform="translate(-384.056 -108.014)" fill="#000812"/>
+    </g>
+    <rect id="Rectangle_20207" data-name="Rectangle 20207" width="24" height="24" transform="translate(42 631)" fill="none"/>
+  </g>
+</svg>

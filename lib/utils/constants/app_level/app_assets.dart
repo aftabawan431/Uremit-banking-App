@@ -1,0 +1,74 @@
+class AppAssets {
+  // SVGs
+  static const uremitLogoSvg = 'assets/svgs/uremit_logo.svg';
+  static const uremitSvg = 'assets/svgs/uremit.svg';
+  static const googleIconSvg = 'assets/svgs/sl_google.svg';
+  static const facebookIconSvg = 'assets/svgs/sl_facebook.svg';
+  static const appleIconSvg = 'assets/svgs/sl_apple.svg';
+  static const unlockFaceSvg = 'assets/svgs/unlock_face.svg';
+  static const unlockFingerSvg = 'assets/svgs/unlock_finger.svg';
+  static const icEmailSvg = 'assets/svgs/ic_email.svg';
+  static const icLockSvg = 'assets/svgs/ic_lock.svg';
+  static const icEyeOpenSvg = 'assets/svgs/ic_eye_open.svg';
+  static const icEyeClosedSvg = 'assets/svgs/ic_eye_closed.svg';
+  static const icPhoneSvg = 'assets/svgs/ic_phone.svg';
+  static const icSuccessSvg = 'assets/svgs/ic_success.svg';
+  static const icDashboardSvg = 'assets/svgs/ic_dashboard.svg';
+  static const icReceiversSvg = 'assets/svgs/ic_receivers.svg';
+  static const icPaymentSvg = 'assets/svgs/ic_payment.svg';
+  static const icCardSvg = 'assets/svgs/ic_card.svg';
+  static const icMenuSvg = 'assets/svgs/ic_menu.svg';
+  static const icDownloadSvg = 'assets/svgs/ic_download.svg';
+  static const icEditSvg = 'assets/svgs/ic_edit.svg';
+  static const icMoneySvg = 'assets/svgs/ic_money.svg';
+  static const icCountrySvg = 'assets/svgs/ic_country.svg';
+  static const icCardVisaSvg = 'assets/svgs/ic_card_visa.svg';
+  static const icCardMastercardSvg = 'assets/svgs/ic_card_master.svg';
+  static const icCardPaypalSvg = 'assets/svgs/ic_card_paypal.svg';
+  static const icCameraSvg = 'assets/svgs/ic_camera.svg';
+  static const icVerifiedSvg = 'assets/svgs/ic_verified.svg';
+  static const icAccountSvg = 'assets/svgs/ic_account.svg';
+  static const icInviteSvg = 'assets/svgs/ic_invite.svg';
+  static const icTrackSvg = 'assets/svgs/ic_track.svg';
+  static const icPrivacyPolicySvg = 'assets/svgs/ic_privacy_policy.svg';
+  static const icContactSvg = 'assets/svgs/ic_contact.svg';
+  static const icDocumentSvg = 'assets/svgs/ic_document.svg';
+  static const icLogoutSvg = 'assets/svgs/ic_logout.svg';
+  static const icAddressSvg = 'assets/svgs/ic_address.svg';
+  static const icAuthoritySvg = 'assets/svgs/ic_authority.svg';
+  static const icCalendarSvg = 'assets/svgs/ic_calendar.svg';
+  static const icCitySvg = 'assets/svgs/ic_city.svg';
+  static const icDocumentNumberSvg = 'assets/svgs/ic_document_number.svg';
+  static const icDocumentTypeSvg = 'assets/svgs/ic_document_type.svg';
+  static const icGenderSvg = 'assets/svgs/ic_gender.svg';
+  static const icNameSvg = 'assets/svgs/ic_name.svg';
+  static const icNationalitySvg = 'assets/svgs/ic_nationality.svg';
+  static const icOccupationSvg = 'assets/svgs/ic_occupation.svg';
+  static const icPostalCodeSvg = 'assets/svgs/ic_postal_code.svg';
+  static const icProvinceSvg = 'assets/svgs/ic_province.svg';
+  static const icPasswordSvg = 'assets/svgs/ic_password.svg';
+  static const icWarningSvg = 'assets/svgs/ic_warning.svg';
+  static const icRemarksSvg = 'assets/svgs/ic_remarks.svg';
+  static const icFolderSvg = 'assets/svgs/ic_folder.svg';
+  static const icViewFileSvg = 'assets/svgs/ic_view_file.svg';
+  static const icPlaceHolderFileSvg = 'assets/svgs/ic_image_placeholder.svg';
+  static const icArrowSvg = 'assets/svgs/ic_arrow.svg';
+  static const icReceiverCountrySvg = 'assets/svgs/ic_receiver_country.svg';
+  static const icPaymentMethodSvg = 'assets/svgs/ic_payment_method.svg';
+  static const icSendMoneySvg = 'assets/svgs/ic_send_money.svg';
+  static const icReasonSvg = 'assets/svgs/ic_reason.svg';
+  static const icIbanSvg = 'assets/svgs/ic_iban.svg';
+  static const icBankSvg = 'assets/svgs/ic_bank.svg';
+  static const icAccountHolderSvg = 'assets/svgs/ic_account_holder_name.svg';
+  static const icRedLogoSvg = 'assets/svgs/ic_red_logo.svg';
+  static const icPoliPaymentSvg = 'assets/svgs/ic_poli_payments.svg';
+  static const icStampSvg = 'assets/svgs/ic_stamp.svg';
+
+  // PNGs
+  static const splashBackgroundPng = 'assets/images/splash_background.png';
+  static const successDialogBackgroundPng = 'assets/images/success_dialog_background.png';
+  static const carouselPlaceholderPng = 'assets/images/carousel_placeholder.jpg';
+  static const transactionPlaceholderPng = 'assets/images/transaction_placeholder.png';
+  static const defaultPicture =
+      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80';
+}
