@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/constants/app_level/app_theme.dart';
 import '../utils/globals/app_globals.dart';
 import '../utils/router/uremit_back_button_dispatcher.dart';
+
 import '../utils/router/uremit_router_delegate.dart';
 import '../utils/router/uremit_router_parser.dart';
 import 'globals.dart';
@@ -27,23 +28,25 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     delegate = UremitRouterDelegate(sl());
     backButtonDispatcher = UremitBackButtonDispatcher(sl());
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),
-      builder: (c) => GestureDetector(
+      builder: (c, wi) => GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Listener(
           onPointerDown: (_) {
             sessionSeconds = defaultSessionSec;
           }, // best place to reset timer imo
-          onPointerMove: (_) => print('move'),
-          onPointerUp: (_) => print('up'),
+          onPointerMove: null,
+          onPointerUp: null,
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Uremit',

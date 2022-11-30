@@ -57,7 +57,7 @@ class UserDetails extends Equatable {
       fullName: json['fullName'] ?? '',
       userName: json['userName'],
       token: json['token'],
-      isVerified: json['isVerified'],
+      isVerified: json['isVerified']??true,
     );
   }
   Map<String, dynamic> toJson() {

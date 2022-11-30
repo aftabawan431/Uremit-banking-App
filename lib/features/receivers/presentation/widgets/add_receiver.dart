@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uremit/app/widgets/customs/tabview/custom_tab_view.dart';
 
 import '../../../../app/widgets/customs/custom_app_bar.dart';
-import '../../../payment/payment_wrapper/presentation/widgets/payment_header.dart';
 import '../../../payment/receiver_info/presentation/pages/receiver_info_page.dart';
 
 class AddReciver extends StatefulWidget {
@@ -27,7 +26,7 @@ class _AddReciverState extends State<AddReciver> {
       appBar: const CustomAppBar(title: 'Receiver'),
       body: Column(
         children: [
-          const PaymentHeader(),
+          // const PaymentHeader(),
           SizedBox(height: 10.h),
           CustomTabView(
             titles: const ['Receiver Info'],

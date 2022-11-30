@@ -115,6 +115,7 @@ class AppTheme {
     listTileTheme: const ListTileThemeData(
       iconColor: Color(0xFF818492),
     ),
+    bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
     inputDecorationTheme: InputDecorationTheme(
       filled: false,
       hintStyle: GoogleFonts.openSans(

@@ -59,7 +59,9 @@ class ProfileHeader extends StatelessWidget {
                         image: context.read<HomeViewModel>().profileImgFile.value != null
                             ? FileImage(context.read<HomeViewModel>().profileImgFile.value!)
                             : context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage.isEmpty
-                                ? const CachedNetworkImageProvider(AppAssets.defaultPicture)
+                                ? const AssetImage(
+                                    AppAssets.defaultPicture,
+                                  )
                                 : CachedNetworkImageProvider(AppUrl.fileBaseUrl + context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage) as ImageProvider,
                         fit: BoxFit.cover,
                       ),

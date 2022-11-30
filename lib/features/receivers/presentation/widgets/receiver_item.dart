@@ -58,7 +58,7 @@ class ReceiverItems extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           alignment: Alignment.center,
-                          child: Text(receiverList[index].firstName[0].toUpperCase() + receiverList[index].lastName[0].toUpperCase(),
+                          child: Text(getFirstLetter(receiverList[index].firstName) + getFirstLetter(receiverList[index].lastName),
                               style: Theme.of(context).textTheme.caption?.copyWith(fontWeight: FontWeight.bold)),
                         ),
                         ClipOval(
@@ -87,5 +87,13 @@ class ReceiverItems extends StatelessWidget {
             },
           );
         });
+  }
+
+  String getFirstLetter(String value){
+    if(value.isNotEmpty){
+      return value[0].toUpperCase();
+    }else{
+      return '';
+    }
   }
 }

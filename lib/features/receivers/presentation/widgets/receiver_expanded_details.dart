@@ -7,9 +7,9 @@ import 'package:uremit/features/receivers/models/receiver_list_response_model.da
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
 import 'package:uremit/features/receivers/presentation/widgets/receiver_banks.dart';
 import 'package:uremit/utils/encryption/encryption.dart';
-import 'package:uremit/utils/router/uremit_router_delegate.dart';
 
 import '../../../../app/widgets/customs/custom_form_field.dart';
+import '../../../../utils/router/uremit_router_delegate.dart';
 
 class ReceiverExpandedDetails extends StatefulWidget {
   ReceiverExpandedDetails({required this.receiverDetails, Key? key}) : super(key: key);
@@ -97,7 +97,6 @@ class _ReceiverExpandedDetailsState extends State<ReceiverExpandedDetails> {
                                 },
                                 child: const Icon(Icons.check_circle_outline, color: Colors.green)),
                             suffixIconOnTap: () {
-                              print('helo');
                             },
                             onTap: () async {},
                           ),
@@ -125,6 +124,8 @@ class _ReceiverExpandedDetailsState extends State<ReceiverExpandedDetails> {
           SizedBox(height: 12.h),
           _detailItem(context, 'Last Name', widget.receiverDetails.lastName),
           SizedBox(height: 12.h),
+          _detailItem(context, 'Relationship', widget.receiverDetails.relationship),
+          SizedBox(height: 12.h),
           _detailItem(context, 'Email', widget.receiverDetails.email),
           SizedBox(height: 12.h),
           _detailItem(context, 'Phone Number', widget.receiverDetails.mobileNumber),
@@ -132,7 +133,9 @@ class _ReceiverExpandedDetailsState extends State<ReceiverExpandedDetails> {
           const Divider(thickness: 1.5, color: Colors.grey),
           SizedBox(height: 10.h),
           ReceiverBanks(
+            receiverId: widget.receiverDetails.receiverId,
             receiverBanks: widget.receiverDetails.banks,
+            countryName: widget.receiverDetails.countryName,
             countryId: Encryption.encryptObject(widget.receiverDetails.countryId),
           ),
           SizedBox(height: 22.h),

@@ -1,6 +1,8 @@
+import 'package:country_calling_code_picker/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:radio_group_v2/radio_group_v2.dart';
@@ -80,24 +82,52 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
                 return CheckboxListTile(
                   value: value,
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: Text('Receiver don\'t have a middle name', style: Theme.of(context).textTheme.caption),
+                  title: Text('User doesn\'t have a middle name', style: Theme.of(context).textTheme.caption),
                   onChanged: context.read<ProfileInfoViewModel>().onMiddleCheckboxClicked,
                 );
               },
             ),
-            CustomTextFormField(
-              inputFormatters: [FilteringTextInputFormatter.deny(RegExp(regexToRemoveEmoji))],
-              maxLines: 1,
-              prefixIconPath: AppAssets.icNameSvg,
-              keyboardType: TextInputType.name,
-              labelText: context.read<ProfileInfoViewModel>().lastNameLabelText,
-              hintText: context.read<ProfileInfoViewModel>().lastNameHintText,
-              controller: context.read<ProfileInfoViewModel>().lastNameController,
-              focusNode: context.read<ProfileInfoViewModel>().lastNameFocusNode,
-              validator: context.read<ProfileInfoViewModel>().validateLastName,
-              onChanged: context.read<ProfileInfoViewModel>().onLastNameChange,
-              onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onLastNameSubmitted(context),
+
+            ValueListenableBuilder<bool>(
+              valueListenable: context.read<ProfileInfoViewModel>().lastNameNotifier,
+              builder: (_, value, __) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: !value
+                      ? Column(
+                    children: [
+                      SizedBox(height: 16.h),
+                      CustomTextFormField(
+                        inputFormatters: [FilteringTextInputFormatter.deny(RegExp(regexToRemoveEmoji))],
+                        maxLines: 1,
+                        prefixIconPath: AppAssets.icNameSvg,
+                        keyboardType: TextInputType.name,
+                        labelText: context.read<ProfileInfoViewModel>().lastNameLabelText,
+                        hintText: context.read<ProfileInfoViewModel>().lastNameHintText,
+                        controller: context.read<ProfileInfoViewModel>().lastNameController,
+                        focusNode: context.read<ProfileInfoViewModel>().lastNameFocusNode,
+                        validator: context.read<ProfileInfoViewModel>().validateLastName,
+                        onChanged: context.read<ProfileInfoViewModel>().onLastNameChange,
+                        onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onLastNameSubmitted(context),
+                      )
+                    ],
+                  )
+                      : const SizedBox.shrink(),
+                );
+              },
             ),
+            ValueListenableBuilder<bool>(
+              valueListenable: context.read<ProfileInfoViewModel>().lastNameNotifier,
+              builder: (_, value, __) {
+                return CheckboxListTile(
+                  value: value,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text('User doesn\'t have a last name', style: Theme.of(context).textTheme.caption),
+                  onChanged: context.read<ProfileInfoViewModel>().onLastCheckboxClicked,
+                );
+              },
+            ),
+
             SizedBox(height: 16.h),
             CustomTextFormField(
               maxLines: 1,
@@ -113,7 +143,7 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
               onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onCobChange(''),
               suffix: Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).canvasColor),
               onTap: () async {
-                PersonalInfoCountriesBottomSheet bottomSheet = PersonalInfoCountriesBottomSheet(context: context, type: 0);
+                PersonalInfoCountriesBottomSheet bottomSheet = PersonalInfoCountriesBottomSheet(context: context, type: 1);
                 context.read<ProfileInfoViewModel>().getCountries();
                 await bottomSheet.show();
               },
@@ -147,7 +177,7 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
               onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onNationalitySubmitted(context),
               suffix: Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).canvasColor),
               onTap: () async {
-                PersonalInfoCountriesBottomSheet bottomSheet = PersonalInfoCountriesBottomSheet(context: context, type: 1);
+                PersonalInfoCountriesBottomSheet bottomSheet = PersonalInfoCountriesBottomSheet(context: context, type:0);
                 context.read<ProfileInfoViewModel>().getCountries();
                 await bottomSheet.show();
               },
@@ -174,26 +204,44 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
               ),
             ),
             SizedBox(height: 16.h),
-            CustomTextFormField(
-              maxLines: 1,
-              prefixIconPath: AppAssets.icContactSvg,
-              keyboardType: TextInputType.phone,
-              labelText: context.read<ProfileInfoViewModel>().phoneLabelText,
-              hintText: context.read<ProfileInfoViewModel>().phoneHintText,
-              controller: context.read<ProfileInfoViewModel>().phoneController,
-              focusNode: context.read<ProfileInfoViewModel>().phoneFocusNode,
-              // inputFormatters: [
-              //   MaskTextInputFormatter(mask: '####-#######', filter: {'#': RegExp(r'[0-9]')}, type: MaskAutoCompletionType.lazy),
-              // ],
-              onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onContactSubmitted(context),
-              validator: context.read<ProfileInfoViewModel>().validatePhone,
-              onChanged: context.read<ProfileInfoViewModel>().onPhoneChange,
+            ValueListenableBuilder<String?>(
+                valueListenable: context
+                    .read<ProfileInfoViewModel>()
+                    .selectedPhoneNumber,
+                builder: (_, value, __) {
+                return CustomTextFormField(
+                  customPrefix: value == null
+                      ? GestureDetector(
+                      onTap: _onTap,
+                      child: SvgPicture.asset(AppAssets.icPhoneSvg))
+                      : GestureDetector(
+                      onTap: _onTap, child: Text(value)),
+                  maxLines: 1,
+                  prefixIconPath: AppAssets.icContactSvg,
+                  keyboardType: TextInputType.phone,
+                  labelText: context.read<ProfileInfoViewModel>().phoneLabelText,
+                  hintText: context.read<ProfileInfoViewModel>().phoneHintText,
+                  controller: context.read<ProfileInfoViewModel>().phoneController,
+                  focusNode: context.read<ProfileInfoViewModel>().phoneFocusNode,
+                  // inputFormatters: [
+                  //   MaskTextInputFormatter(mask: '####-#######', filter: {'#': RegExp(r'[0-9]')}, type: MaskAutoCompletionType.lazy),
+                  // ],
+                  onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onContactSubmitted(context),
+                  validator: context.read<ProfileInfoViewModel>().validatePhone,
+                  onChanged: context.read<ProfileInfoViewModel>().onPhoneChange,
+                );
+              }
             ),
             SizedBox(height: 16.h),
             CustomTextFormField(
               maxLines: 1,
               readOnly: true,
               prefixIconPath: AppAssets.icCalendarSvg,
+
+
+
+              maxLengthEnforced: true,
+              maxLength: 13,
               keyboardType: TextInputType.datetime,
               labelText: context.read<ProfileInfoViewModel>().dobLabelText,
               hintText: context.read<ProfileInfoViewModel>().dobHintText,
@@ -205,7 +253,7 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
               suffix: Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).canvasColor),
               onTap: () async {
                 final selectDateTimeBottomSheet =
-                    DateTimeBottomSheet(context: context, initialSelectedDate: context.read<ProfileInfoViewModel>().dobDateTime.subtract(const Duration(days: 6573)), isDob: true);
+                DateTimeBottomSheet(context: context, initialSelectedDate: context.read<ProfileInfoViewModel>().dobDateTime.subtract(const Duration(days: 6573)), isDob: true);
                 await selectDateTimeBottomSheet.show();
                 print(context.read<DateTimeProvider>().dateTime.value);
                 if (context.read<DateTimeProvider>().dateTime.value != null) {
@@ -219,6 +267,15 @@ class _PersonalInfoDetailsState extends State<PersonalInfoDetails> with Automati
     );
   }
 
+  void _onTap() async {
+    final country = await showCountryPickerSheet(
+      context,
+    );
+    if (country != null) {
+      context.read<ProfileInfoViewModel>().selectedPhoneNumber.value =
+          country.callingCode;
+    }
+  }
   @override
   bool get wantKeepAlive => true;
 }

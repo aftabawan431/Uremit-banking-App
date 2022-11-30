@@ -25,6 +25,7 @@ class AccountWrapperPageContent extends StatefulWidget {
 
 class _AccountWrapperPageContentState extends State<AccountWrapperPageContent> {
   int index = 0;
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -50,7 +51,7 @@ class _AccountWrapperPageContentState extends State<AccountWrapperPageContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const CustomAppBar(title: 'Account'),
+      appBar: const CustomAppBar(title: 'My Profile'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:developer' as log;
 
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'package:radio_group_v2/radio_group_v2.dart';
+import 'package:uremit/features/menu/account_wrapper/presentation/manager/account_wrapper_view_model.dart';
 import 'package:uremit/features/menu/update_profile/models/doc_type_request_model.dart';
 import 'package:uremit/features/menu/update_profile/models/doc_type_response_model.dart';
 import 'package:uremit/features/menu/update_profile/models/get_countries_response_model.dart';
@@ -31,7 +35,11 @@ import '../../models/countries_province_request_model.dart';
 import '../../models/countries_province_response_model.dart';
 
 class UpdateProfileViewModel extends ChangeNotifier {
-  UpdateProfileViewModel({required this.getCountriesUsecase, required this.setProfileDetailsUsecase, required this.countriesProvinceUsecase, required this.docTypeUsecase});
+  UpdateProfileViewModel(
+      {required this.getCountriesUsecase,
+      required this.setProfileDetailsUsecase,
+      required this.countriesProvinceUsecase,
+      required this.docTypeUsecase});
 
   // Usecases
   GetCountriesUsecase getCountriesUsecase;
@@ -44,6 +52,7 @@ class UpdateProfileViewModel extends ChangeNotifier {
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> middleNameNotifier = ValueNotifier(true);
+  ValueNotifier<bool> lastNameNotifier = ValueNotifier(true);
 
   ValueNotifier<bool> isCountryLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isProvinceLoadingNotifier = ValueNotifier(false);
@@ -117,7 +126,7 @@ class UpdateProfileViewModel extends ChangeNotifier {
   final FocusNode nationalityFocusNode = FocusNode();
 
   final String phoneLabelText = 'Contact Number';
-  final String phoneHintText = '03xx-xxxxxxx';
+  final String phoneHintText = 'xxxxxxxxxxx';
   final TextEditingController phoneController = TextEditingController();
   final FocusNode phoneFocusNode = FocusNode();
 
@@ -126,6 +135,7 @@ class UpdateProfileViewModel extends ChangeNotifier {
     'Male',
     'Female',
   ];
+  ValueNotifier<String?> selectedPhoneNumber = ValueNotifier('+61');
 
   DateTime dobDateTime = DateTime.now();
   final String dobLabelText = 'Date of Birth';
@@ -134,23 +144,24 @@ class UpdateProfileViewModel extends ChangeNotifier {
   final FocusNode dobFocusNode = FocusNode();
 
   final String addressLabelText = 'Address';
-  final String addressHintText = 'Enter Address';
+  final String addressHintText = 'Enter Street Number and Name';
   final TextEditingController addressController = TextEditingController();
   final FocusNode addressFocusNode = FocusNode();
 
-  final String postalLabelText = 'Postal Code';
-  final String postalHintText = 'Enter Postal Code';
+  final String postalLabelText = 'Post Code';
+  final String postalHintText = 'Enter Post Code';
   final TextEditingController postalController = TextEditingController();
   final FocusNode postalFocusNode = FocusNode();
 
-  final String cityLabelText = 'City';
-  final String cityHintText = 'Enter City';
+  final String cityLabelText = 'Suburb';
+  final String cityHintText = 'Enter Suburb';
   final TextEditingController cityController = TextEditingController();
   final FocusNode cityFocusNode = FocusNode();
 
-  final String provinceLabelText = 'Province';
-  final String provinceHintText = 'Select Province';
+  final String provinceLabelText = 'State';
+  final String provinceHintText = 'Select State';
   final TextEditingController provinceController = TextEditingController();
+
   String provinceId = '';
   final FocusNode provinceFocusNode = FocusNode();
 
@@ -162,7 +173,8 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
   final String documentNumberLabelText = 'Document Number';
   final String documentNumberHintText = 'Enter Document Number';
-  final TextEditingController documentNumberController = TextEditingController();
+  final TextEditingController documentNumberController =
+      TextEditingController();
   final FocusNode documentNumberFocusNode = FocusNode();
 
   final String frontSideLabelText = 'Front Side';
@@ -187,12 +199,14 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
   final String issuingAuthorityLabelText = 'Issuing Authority';
   final String issuingAuthorityHintText = 'Enter Issuing Authority';
-  final TextEditingController issuingAuthorityController = TextEditingController();
+  final TextEditingController issuingAuthorityController =
+      TextEditingController();
   final FocusNode issuingAuthorityFocusNode = FocusNode();
 
   final String issuingCountryLabelText = 'Issuing Country';
   final String issuingCountryHintText = 'Select Issuing Country';
-  final TextEditingController issuingCountryController = TextEditingController();
+  final TextEditingController issuingCountryController =
+      TextEditingController();
   String issuingId = '';
   final FocusNode issuingCountryFocusNode = FocusNode();
 
@@ -227,8 +241,10 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
   // Usecase Calls
   Future<void> getCountries() async {
+    // Logger().v("we are here");
     if (countriesList != null) {
       return;
+      // Logger().v("we are here");
     }
 
     isCountryLoadingNotifier.value = true;
@@ -253,7 +269,8 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
     isProvinceLoadingNotifier.value = true;
 
-    var provinceEither = await countriesProvinceUsecase.call(CountriesProvinceRequestModel(id));
+    var provinceEither =
+        await countriesProvinceUsecase.call(CountriesProvinceRequestModel(id));
 
     if (provinceEither.isLeft()) {
       handleError(provinceEither);
@@ -290,17 +307,18 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
   Future<void> updateProfileData(BuildContext context) async {
     isUpdateNotifier.value = true;
+    FocusScope.of(context).unfocus();
 
     var params = SetProfileDetailsRequestModel(
         userId: _accountProvider.userDetails!.userDetails.id.toString(),
         firstName: firstNameController.text,
-        middleName: middleNameController.text,
-        lastName: lastNameController.text,
+        middleName: !middleNameNotifier.value ? middleNameController.text : '',
+        lastName: !lastNameNotifier.value ? lastNameController.text : '',
         birthCountryId: cobId.toString(),
         occupation: occupationController.text,
         nationalityCountryId: nationalityId.toString(),
         genderId: genderRadioController.value == 'Female' ? 1 : 0,
-        phoneNumber: phoneController.text,
+        phoneNumber:selectedPhoneNumber.value!+ phoneController.text,
         dob: dobController.text,
         address: addressController.text,
         postalCode: postalController.text,
@@ -330,24 +348,6 @@ class UpdateProfileViewModel extends ChangeNotifier {
             isActive: true,
             remarks: ''.toString(),
           ),
-          // Attachment(
-          //   id: backFileId.toString(),
-          //   fileName: backSideController.text.toString(),
-          //   docNumber: documentNumberController.text,
-          //   path: backFilePath,
-          //   attachmentTypeId: documentId,
-          //   documentType: ''.toString(),
-          //   userId: _accountProvider.userDetails!.userDetails.id.toString(),
-          //   createdBy: ''.toString(),
-          //   expiryDate: expiryController.text,
-          //   issuingAuthority: issuingAuthorityController.text,
-          //   issuingCountryId: issuingId.toString(),
-          //   isIdentityId: true,
-          //   file: backSide == null ? '' : backSide!,
-          //   isRequired: true,
-          //   isActive: true,
-          //   remarks: ''.toString(),
-          // ),
           Attachment(
             id: utilityFileId.toString(),
             docNumber: ''.toString(),
@@ -374,6 +374,9 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
     // Logger().i(params.toJson());
     // print(params.toJson());
+    // log.log(jsonEncode(params.toJson()));
+    // return;
+    Logger().v(params.toJson());
     var updateEither = await setProfileDetailsUsecase(params);
 
     if (updateEither.isLeft()) {
@@ -382,8 +385,10 @@ class UpdateProfileViewModel extends ChangeNotifier {
     } else if (updateEither.isRight()) {
       updateEither.foldRight(null, (response, previous) {
         updateEither.foldRight(null, (response, _) {
-          onErrorMessage?.call(OnErrorMessageModel(message: 'Successful', backgroundColor: Colors.green));
+          onErrorMessage?.call(OnErrorMessageModel(
+              message: 'Successful', backgroundColor: Colors.green));
         });
+        goBackToProfileDetails();
         isUpdateNotifier.value = false;
       });
       isUpdateNotifier.value = false;
@@ -391,6 +396,12 @@ class UpdateProfileViewModel extends ChangeNotifier {
   }
 
   // Methods
+
+  goBackToProfileDetails() {
+    AccountWrapperViewModel provider = sl();
+    provider.bottomNavigationKey.currentState!.setPage(0);
+  }
+
   clearFields() {
     middleNameController.text = '';
   }
@@ -406,19 +417,27 @@ class UpdateProfileViewModel extends ChangeNotifier {
   void validateFirstPage() {
     isPersonalPageChange = true;
     if (!personalFormKey.currentState!.validate()) {
-      pageController.animateToPage(0, duration: const Duration(milliseconds: 100), curve: Curves.easeInOutCubic);
+      pageController.animateToPage(0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOutCubic);
     }
   }
 
   void validateSecondPage() {
     isAddressPageChange = true;
     if (!addressFormKey.currentState!.validate()) {
-      pageController.animateToPage(1, duration: const Duration(milliseconds: 100), curve: Curves.easeInOutCubic);
+      pageController.animateToPage(1,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOutCubic);
     }
   }
 
   void onMiddleCheckboxClicked(bool? value) {
     middleNameNotifier.value = value ?? false;
+  }
+
+  void onLastCheckboxClicked(bool? value) {
+    lastNameNotifier.value = value ?? false;
   }
 
   void onFirstNameSubmitted(BuildContext context) {
@@ -620,7 +639,7 @@ class UpdateProfileViewModel extends ChangeNotifier {
       return null;
     }
     isPhoneError = true;
-    var result = FormValidators.validatePhone(value!.replaceAll('-', ''));
+    var result = FormValidators.validatePhone(selectedPhoneNumber.value, value);
     if (result == null) {
       isPhoneError = false;
     }
@@ -883,15 +902,18 @@ class UpdateProfileViewModel extends ChangeNotifier {
 
   XFile? selectedFile;
   ValueNotifier<File?> docsImgFile = ValueNotifier(null);
-  Future<void> pickFiles(BuildContext context, AttachmentType type, String source) async {
+  Future<void> pickFiles(
+      BuildContext context, AttachmentType type, String source) async {
     selectedFile = null;
     try {
       switch (source) {
         case 'camera':
-          selectedFile = (await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 50));
+          selectedFile = (await ImagePicker()
+              .pickImage(source: ImageSource.camera, imageQuality: 50));
           break;
         case 'gallery':
-          selectedFile = (await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50));
+          selectedFile = (await ImagePicker()
+              .pickImage(source: ImageSource.gallery, imageQuality: 50));
           break;
       }
       if (selectedFile != null) {
@@ -901,7 +923,8 @@ class UpdateProfileViewModel extends ChangeNotifier {
           switch (type) {
             case AttachmentType.frontSide:
               frontSide = base64;
-              frontSideController.text = docsImgFile.value!.path.split('/').last;
+              frontSideController.text =
+                  docsImgFile.value!.path.split('/').last;
               break;
             case AttachmentType.backSide:
               backSide = base64;
@@ -975,42 +998,60 @@ class UpdateProfileViewModel extends ChangeNotifier {
   }
 
   void loadProfileData(GetProfileDetailsResponseModel? profileDetails) {
+    Logger().v(profileDetails!.toJson());
     if (profileDetails != null) {
       firstNameController.text = profileDetails.ProfileDetailsBody.firstName;
 
       if (profileDetails.ProfileDetailsBody.middleName.isNotEmpty) {
         middleNameNotifier.value = false;
-        middleNameController.text = profileDetails.ProfileDetailsBody.middleName;
+        middleNameController.text =
+            profileDetails.ProfileDetailsBody.middleName;
       }
-      lastNameController.text = profileDetails.ProfileDetailsBody.lastName;
+      if (profileDetails.ProfileDetailsBody.lastName.isNotEmpty) {
+        lastNameNotifier.value = false;
+        lastNameController.text = profileDetails.ProfileDetailsBody.lastName;
+      }
       cobController.text = profileDetails.ProfileDetailsBody.birthCountry;
       cobId = profileDetails.ProfileDetailsBody.birthCountryID;
       occupationController.text = profileDetails.ProfileDetailsBody.occupation;
-      nationalityController.text = profileDetails.ProfileDetailsBody.nationalityCountry;
+      nationalityController.text =
+          profileDetails.ProfileDetailsBody.nationalityCountry;
       nationalityId = profileDetails.ProfileDetailsBody.nationalityCountryID;
-      genderRadioController.selectAt(profileDetails.ProfileDetailsBody.genderId);
-      phoneController.text = profileDetails.ProfileDetailsBody.phoneNumber;
+      genderRadioController
+          .selectAt(profileDetails.ProfileDetailsBody.genderId);
+      Logger().v(profileDetails.ProfileDetailsBody.phoneNumber);
+
+      final phone = PhoneNumber.parse(profileDetails.ProfileDetailsBody.phoneNumber);
+      selectedPhoneNumber.value='+'+phone.countryCode;
+      phoneController.text =phone.nsn;
+
       dobController.text = profileDetails.ProfileDetailsBody.dob;
       addressController.text = profileDetails.ProfileDetailsBody.address;
       postalController.text = profileDetails.ProfileDetailsBody.postalCode;
       cityController.text = profileDetails.ProfileDetailsBody.city;
       provinceController.text = profileDetails.ProfileDetailsBody.province;
       provinceId = profileDetails.ProfileDetailsBody.provinceID;
-      documentTypeController.text = profileDetails.ProfileDetailsBody.attachment1Type;
+      documentTypeController.text =
+          profileDetails.ProfileDetailsBody.attachment1Type;
       documentId = profileDetails.ProfileDetailsBody.attachment1IdType;
       // docum.text = profileDetails.profileDetailsBody.filename;
-      documentNumberController.text = profileDetails.ProfileDetailsBody.documentNumber;
-      frontSideController.text = profileDetails.ProfileDetailsBody.frontFileName;
+      documentNumberController.text =
+          profileDetails.ProfileDetailsBody.documentNumber;
+      frontSideController.text =
+          profileDetails.ProfileDetailsBody.frontFileName;
       frontFilePath = profileDetails.ProfileDetailsBody.frontFilePath;
       frontFileId = profileDetails.ProfileDetailsBody.attachment1Id;
       backSideController.text = profileDetails.ProfileDetailsBody.backFileName;
       backFilePath = profileDetails.ProfileDetailsBody.backFilePath;
       // backFileId = profileDetails.ProfileDetailsBody.backFileId2;
       expiryController.text = profileDetails.ProfileDetailsBody.expiryDate;
-      issuingAuthorityController.text = profileDetails.ProfileDetailsBody.issuingAuthority;
-      issuingCountryController.text = profileDetails.ProfileDetailsBody.issuingCountry;
+      issuingAuthorityController.text =
+          profileDetails.ProfileDetailsBody.issuingAuthority;
+      issuingCountryController.text =
+          profileDetails.ProfileDetailsBody.issuingCountry;
       issuingId = profileDetails.ProfileDetailsBody.issuingCountryID;
-      utilityController.text = profileDetails.ProfileDetailsBody.utilityBillFileName;
+      utilityController.text =
+          profileDetails.ProfileDetailsBody.utilityBillFileName;
       utilityFilePath = profileDetails.ProfileDetailsBody.utilityBillPath;
       utilityFileId = profileDetails.ProfileDetailsBody.attachment2Id;
       utilityDocumentId = profileDetails.ProfileDetailsBody.attachment2IdType;
@@ -1020,7 +1061,9 @@ class UpdateProfileViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
 // Page Moves

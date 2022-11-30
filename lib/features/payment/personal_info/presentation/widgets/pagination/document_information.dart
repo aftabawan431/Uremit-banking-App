@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/bottom_sheets/personal_info_countried_bottom_sheet.dart';
-import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
 import 'package:uremit/utils/constants/enums/attachment_type.dart';
 
 import '../../../../../../app/providers/date_time_provider.dart';
@@ -14,6 +13,7 @@ import '../../../../../../app/widgets/customs/continue_button.dart';
 import '../../../../../../app/widgets/customs/custom_form_field.dart';
 import '../../../../../../utils/constants/app_level/app_assets.dart';
 import '../../../../../../utils/globals/app_globals.dart';
+import '../../../../../home/presentation/manager/home_view_model.dart';
 import '../../../../../menu/profile/presentation/manager/profile_view_model.dart';
 import '../../manager/personal_info_view_model.dart';
 
@@ -171,7 +171,7 @@ class PersonalInfoDocumentInformation extends StatelessWidget {
               onChanged: context.read<ProfileInfoViewModel>().onUtilityChange,
               onFieldSubmitted: (_) => context.read<ProfileInfoViewModel>().onUtilitySubmitted(context),
               onTap: () async {
-                await context.read<ProfileInfoViewModel>().personalDetailsImageSelector(context, AttachmentType.frontSide);
+                await context.read<ProfileInfoViewModel>().personalDetailsImageSelector(context, AttachmentType.utilityBill);
               },
             ),
             SizedBox(height: 16.h),
@@ -183,11 +183,13 @@ class PersonalInfoDocumentInformation extends StatelessWidget {
                 if (!context.read<ProfileInfoViewModel>().documentFormKey.currentState!.validate()) {
                   return;
                 }
+
+                // context.read<ProfileInfoViewModel>().goBackToReceiverInfo();
                 await context.read<ProfileInfoViewModel>().saveProfileData(context);
 
                 context.read<HomeViewModel>().isLoadingNotifier.value = true;
 
-                await context.read<ProfileViewModel>().getProfile(recall: true);
+                await context.read<ProfileViewModel>().getProfile(recall: true,reLoadData: true);
 
                 await context.read<HomeViewModel>().getProfileHeader(recall: true);
               },

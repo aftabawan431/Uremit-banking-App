@@ -39,4 +39,5 @@ enum Pages {
   addReceiverInfo,
   interactiveHeroPageScreen,
   summaryDetailsScreen,
+  webViewPage,
 }

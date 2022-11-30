@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
+import 'package:uremit/features/payment/receiver_info/presentation/manager/receiver_info_view_model.dart';
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
 
 import '../../../../../app/globals.dart';
@@ -18,6 +19,7 @@ class _PaymentDetailsPageState extends State<PaymentDetailsPage> {
   final PaymentDetailsViewModel _viewModel = sl();
   final HomeViewModel _homeViewModel=sl();
   final ReceiverViewModel _receiverViewModel=sl();
+  final ReceiverInfoViewModel receiverInfoViewModel=sl();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class _PaymentDetailsPageState extends State<PaymentDetailsPage> {
                 ChangeNotifierProvider.value(value: _viewModel),
                 ChangeNotifierProvider.value(value: _homeViewModel),
                 ChangeNotifierProvider.value(value: _receiverViewModel),
+                ChangeNotifierProvider.value(value: receiverInfoViewModel),
               ],
               child: const PaymentDetailsPageContent())
         ),

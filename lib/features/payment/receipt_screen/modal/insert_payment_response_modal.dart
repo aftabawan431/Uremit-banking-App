@@ -46,12 +46,16 @@ class Body extends Equatable {
       required this.errorCode,
       required this.errorMessage,
       required this.navigateUrl,
-      required this.transactionRefNo});
+      required this.transactionRefNo,
+      required this.txn,
+
+      });
   final bool success;
   final String navigateUrl;
   final int errorCode;
   final String errorMessage;
   final String transactionRefNo;
+  final String txn;
 
   factory Body.fromJson(Map<String, dynamic> json) {
     return Body(
@@ -59,13 +63,15 @@ class Body extends Equatable {
         errorCode: json['errorCode']??0,
         errorMessage: json['errorMessage']??'',
         navigateUrl: json['errorMessage']??'',
-        transactionRefNo: json['errorMessge']??'');
+        transactionRefNo: json['errorMessge']??'',
+      txn: json['txn']??'',
+    );
   }
 
   @override
   // TODO: implement props
   List<Object?> get props =>
-      [success, errorMessage, errorCode, navigateUrl, transactionRefNo];
+      [success, errorMessage, errorCode, navigateUrl, transactionRefNo,txn];
 }
 
 class Checkout extends Equatable {
@@ -85,6 +91,7 @@ class Checkout extends Equatable {
     _data['token'] = token;
     _data['redirect_url'] = redirectUrl;
     return _data;
+
   }
 
   @override

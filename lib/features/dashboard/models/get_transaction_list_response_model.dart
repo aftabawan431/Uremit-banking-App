@@ -8,13 +8,15 @@ class GetTransactionListResponseModel {
   late final String StatusCode;
   late final String StatusMessage;
   late final String TraceId;
-  late final GetTransactionListResponseModelBody getTransactionListResponseModelBody;
+  late final GetTransactionListResponseModelBody
+      getTransactionListResponseModelBody;
 
-  GetTransactionListResponseModel.fromJson(Map<String, dynamic> json){
+  GetTransactionListResponseModel.fromJson(Map<String, dynamic> json) {
     StatusCode = json['StatusCode'];
     StatusMessage = json['StatusMessage'];
     TraceId = json['TraceId'];
-    getTransactionListResponseModelBody = GetTransactionListResponseModelBody.fromJson(json['Body']);
+    getTransactionListResponseModelBody =
+        GetTransactionListResponseModelBody.fromJson(json['Body']);
   }
 
   Map<String, dynamic> toJson() {
@@ -35,14 +37,16 @@ class GetTransactionListResponseModelBody {
   late final List<TransactionList> transactionList;
   late final TransactionsStats transactionsStats;
 
-  GetTransactionListResponseModelBody.fromJson(Map<String, dynamic> json){
-    transactionList = List.from(json['transactionList']).map((e)=>TransactionList.fromJson(e)).toList();
+  GetTransactionListResponseModelBody.fromJson(Map<String, dynamic> json) {
+    transactionList = List.from(json['transactionList'])
+        .map((e) => TransactionList.fromJson(e))
+        .toList();
     transactionsStats = TransactionsStats.fromJson(json['transactionsStats']);
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
-    _data['transactionList'] = transactionList.map((e)=>e.toJson()).toList();
+    _data['transactionList'] = transactionList.map((e) => e.toJson()).toList();
     _data['transactionsStats'] = transactionsStats.toJson();
     return _data;
   }
@@ -54,68 +58,145 @@ class TransactionList {
     required this.txn,
     required this.iban,
     required this.bankCode,
-    required this.amount,
-    required this.charges,
-    required this.totalAmount,
+    required this.deliveredAmount,
+    required this.totalFee,
+    required this.sendingAmount,
+    required this.senderCardId,
     required this.foreignAmount,
-    required this.exchnageRate,
+    required this.exchangeRate,
     required this.foreignCurrency,
     required this.countrySvg,
+    required this.receiverId,
+    required this.receiverBankAccountId,
     required this.receiverName,
     required this.payoutMethod,
+    required this.payoutMethodId,
+    required this.payoutMethodFee,
     required this.payoutPartner,
+    required this.payoutPartnerId,
+    required this.payoutPartnerFee,
     required this.paymentGateway,
+    required this.paymentGatewayId,
+    required this.paymentGatewayFee,
     required this.bankName,
     required this.accountNo,
     required this.date,
     required this.time,
     required this.status,
     required this.statusList,
+    required this.isReceiverDeleted,
+    required this.bankDetails,
+    required this.reason,
+    required this.adminFee,
+    required this.receiverCountryCurrencyID,
+    required this.beneficiaryAccountNumber,
+    required this.beneficiaryAddress,
+    required this.beneficiaryBankBranchCode,
+    required this.beneficiaryBankName,
+    required this.beneficiaryMobile,
+    required this.beneficiaryName,
+    required this.senderAddress,
+    required this.senderID,
+    required this.senderName,
+    required this.senderPhone,
   });
   late final String id;
   late final String txn;
   late final String iban;
   late final String bankCode;
-  late final double amount;
-  late final double charges;
-  late final double totalAmount;
+  late final double deliveredAmount;
+  late final double totalFee;
+  late final double sendingAmount;
+  late final String senderCardId;
   late final double foreignAmount;
-  late final double exchnageRate;
+  late final double exchangeRate;
   late final String foreignCurrency;
   late final String countrySvg;
+  late final String receiverId;
+  late final String receiverBankAccountId;
   late final String receiverName;
   late final String payoutMethod;
+  late final String reason;
+  late final String payoutMethodId;
+  late final double payoutMethodFee;
   late final String payoutPartner;
+  late final String payoutPartnerId;
+  late final double payoutPartnerFee;
   late final String paymentGateway;
+  late final String paymentGatewayId;
+  late final double paymentGatewayFee;
   late final String bankName;
   late final String accountNo;
+  late final double adminFee;
+  late final String receiverCountryCurrencyID;
   late final String date;
   late final String time;
   late final String status;
   late final List<StatusList> statusList;
+  late final bool isReceiverDeleted;
+  late final BankDetails bankDetails;
+  late final String beneficiaryName;
+  late final String beneficiaryAddress;
+  late final String beneficiaryMobile;
+  late final String beneficiaryAccountNumber;
+  late final String beneficiaryBankName;
+  late final String beneficiaryBankBranchCode;
+  late final String senderName;
+  late final String senderAddress;
+  late final String senderPhone;
+  late final String senderID;
 
-  TransactionList.fromJson(Map<String, dynamic> json){
+  TransactionList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     txn = json['txn'];
     iban = json['iban'];
     bankCode = json['bankCode'];
-    amount = (json['amount'] as num).toDouble();
-    charges = (json['charges'] as num).toDouble();
-    totalAmount = (json['totalAmount'] as num).toDouble();
-    foreignAmount = (json['foreignAmount'] as num).toDouble();
-    exchnageRate = (json['exchnageRate'] as num).toDouble();
+    deliveredAmount = json['deliveredAmount'];
+    totalFee = json['totalFee'];
+    sendingAmount = json['sendingAmount'];
+    senderCardId = json['senderCardId'];
+    foreignAmount = json['foreignAmount'];
+    exchangeRate = json['exchangeRate'];
     foreignCurrency = json['foreignCurrency'];
+    reason = json['reason'];
     countrySvg = json['countrySvg'];
+    receiverId = json['receiverId'];
+    receiverBankAccountId = json['receiverBankAccountId'];
     receiverName = json['receiverName'];
     payoutMethod = json['payoutMethod'];
+    payoutMethodId = json['payoutMethodId'];
+    payoutMethodFee = json['payoutMethodFee'];
     payoutPartner = json['payoutPartner'];
+    payoutPartnerId = json['payoutPartnerId'];
+    payoutPartnerFee = json['payoutPartnerFee'];
     paymentGateway = json['paymentGateway'];
+    paymentGatewayId = json['paymentGatewayId'];
+    paymentGatewayFee = json['paymentGatewayFee'];
     bankName = json['bankName'];
     accountNo = json['accountNo'];
     date = json['date'];
     time = json['time'];
+    receiverCountryCurrencyID = json['receiverCountryCurrencyID'];
+    adminFee = (json['adminFee'] as num).toDouble();
     status = json['status'];
-    statusList = List.from(json['statusList']).map((e)=>StatusList.fromJson(e)).toList();
+    statusList = List.from(json['statusList'])
+        .map((e) => StatusList.fromJson(e))
+        .toList();
+    isReceiverDeleted = json['isReceiverDeleted'];
+    bankDetails = BankDetails.fromJson(
+      json['bankDetails'],
+    );
+
+    beneficiaryName = json['beneficiaryName'];
+    beneficiaryAddress = json['beneficiaryAddress'];
+    beneficiaryMobile = json['beneficiaryMobile'];
+    beneficiaryAccountNumber = json['beneficiaryAccountNumber'];
+    beneficiaryBankName = json['beneficiaryBankName'];
+    beneficiaryBankBranchCode = json['beneficiaryBankBranchCode'];
+    senderName = json['senderName'];
+    senderAddress = json['senderAddress'];
+    senderPhone = json['senderPhone'];
+    senderID = json['senderID'];
   }
 
   Map<String, dynamic> toJson() {
@@ -124,23 +205,35 @@ class TransactionList {
     _data['txn'] = txn;
     _data['iban'] = iban;
     _data['bankCode'] = bankCode;
-    _data['amount'] = amount;
-    _data['charges'] = charges;
-    _data['totalAmount'] = totalAmount;
+    _data['deliveredAmount'] = deliveredAmount;
+    _data['totalFee'] = totalFee;
+    _data['sendingAmount'] = sendingAmount;
+    _data['senderCardId'] = senderCardId;
     _data['foreignAmount'] = foreignAmount;
-    _data['exchnageRate'] = exchnageRate;
+    _data['exchangeRate'] = exchangeRate;
     _data['foreignCurrency'] = foreignCurrency;
     _data['countrySvg'] = countrySvg;
+    _data['receiverId'] = receiverId;
+    _data['reason'] = reason;
+    _data['receiverBankAccountId'] = receiverBankAccountId;
     _data['receiverName'] = receiverName;
     _data['payoutMethod'] = payoutMethod;
+    _data['payoutMethodId'] = payoutMethodId;
+    _data['payoutMethodFee'] = payoutMethodFee;
     _data['payoutPartner'] = payoutPartner;
+    _data['payoutPartnerId'] = payoutPartnerId;
+    _data['payoutPartnerFee'] = payoutPartnerFee;
     _data['paymentGateway'] = paymentGateway;
+    _data['paymentGatewayId'] = paymentGatewayId;
+    _data['paymentGatewayFee'] = paymentGatewayFee;
     _data['bankName'] = bankName;
     _data['accountNo'] = accountNo;
     _data['date'] = date;
     _data['time'] = time;
     _data['status'] = status;
-    _data['statusList'] = statusList.map((e)=>e.toJson()).toList();
+    _data['statusList'] = statusList.map((e) => e.toJson()).toList();
+    _data['isReceiverDeleted'] = isReceiverDeleted;
+    _data['bankDetails'] = bankDetails.toJson();
     return _data;
   }
 }
@@ -153,15 +246,15 @@ class StatusList {
   late final String date;
   late final List<Status> status;
 
-  StatusList.fromJson(Map<String, dynamic> json){
+  StatusList.fromJson(Map<String, dynamic> json) {
     date = json['date'];
-    status = List.from(json['status']).map((e)=>Status.fromJson(e)).toList();
+    status = List.from(json['status']).map((e) => Status.fromJson(e)).toList();
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['date'] = date;
-    _data['status'] = status.map((e)=>e.toJson()).toList();
+    _data['status'] = status.map((e) => e.toJson()).toList();
     return _data;
   }
 }
@@ -174,7 +267,7 @@ class Status {
   late final String time;
   late final String text;
 
-  Status.fromJson(Map<String, dynamic> json){
+  Status.fromJson(Map<String, dynamic> json) {
     time = json['time'];
     text = json['text'];
   }
@@ -183,6 +276,31 @@ class Status {
     final _data = <String, dynamic>{};
     _data['time'] = time;
     _data['text'] = text;
+    return _data;
+  }
+}
+
+class BankDetails {
+  BankDetails({
+    required this.accountNo,
+    required this.accountName,
+    required this.txn,
+  });
+  late final String accountNo;
+  late final String accountName;
+  late final String txn;
+
+  BankDetails.fromJson(Map<String, dynamic> json) {
+    accountNo = json['accountNo'];
+    accountName = json['accountName'];
+    txn = json['txn'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['accountNo'] = accountNo;
+    _data['accountName'] = accountName;
+    _data['txn'] = txn;
     return _data;
   }
 }
@@ -197,7 +315,7 @@ class TransactionsStats {
   late final int successfullTransaction;
   late final int pendingTransaction;
 
-  TransactionsStats.fromJson(Map<String, dynamic> json){
+  TransactionsStats.fromJson(Map<String, dynamic> json) {
     totalTransaction = json['totalTransaction'];
     successfullTransaction = json['successfullTransaction'];
     pendingTransaction = json['pendingTransaction'];

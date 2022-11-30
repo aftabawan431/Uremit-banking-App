@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:uremit/features/menu/profile/models/get_profile_details_request_model.dart';
 import 'package:uremit/features/menu/profile/models/get_profile_details_response_model.dart';
 import 'package:uremit/features/menu/profile/usecases/get_profile_details_usecase.dart';
+import 'package:uremit/features/menu/update_profile/presentation/manager/update_profile_view_model.dart';
 import 'package:uremit/services/models/on_error_message_model.dart';
 
 import '../../../../../app/globals.dart';
@@ -34,7 +35,7 @@ class ProfileViewModel extends ChangeNotifier {
   AccountProvider get _accountProvider => sl();
 
   // Usecase Calls
-  Future<void> getProfile({bool recall = false}) async {
+  Future<void> getProfile({bool recall = false,bool reLoadData=false}) async {
     if (!recall) {
       if (profileDetails != null) {
         return;
@@ -54,6 +55,11 @@ class ProfileViewModel extends ChangeNotifier {
       getProfileEither.foldRight(null, (response, _) {
         profileDetails = response;
         print('this is the response of getProfile $profileDetails');
+        if(reLoadData){
+          UpdateProfileViewModel updateProfileViewModel=sl();
+          updateProfileViewModel.loadProfileData(response);
+
+        }
       });
       isLoadingNotifier.value = false;
 

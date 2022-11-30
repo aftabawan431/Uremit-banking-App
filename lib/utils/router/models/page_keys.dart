@@ -20,4 +20,5 @@ class PageKeys {
 
   static const String interactiveHeroPageScreenPageKey = 'INTERACTIVE_IMAGE_INFO_PAGE_KEY';
   static const String summaryDetailsScreenPageKey = 'SUMMARY_DETAILS_SCREEN_PAGE_KEY';
+  static const String webViewPageKey = 'WEB_VIEW_PAGE_KEY';
 }

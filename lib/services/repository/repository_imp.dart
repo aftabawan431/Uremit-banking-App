@@ -25,6 +25,8 @@ import 'package:uremit/features/dashboard/models/get_transaction_list_request_mo
 import 'package:uremit/features/dashboard/models/get_transaction_list_response_model.dart';
 import 'package:uremit/features/files/required_files/models/get_required_file_response_model.dart';
 import 'package:uremit/features/files/required_files/models/get_required_files_request_model.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approval_response_model.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approvel_request_model.dart';
 import 'package:uremit/features/home/models/profile_image_request_model.dart';
 import 'package:uremit/features/home/models/profile_image_response_model.dart';
 import 'package:uremit/features/menu/documents/models/doc_requied_request_model.dart';
@@ -40,9 +42,17 @@ import 'package:uremit/features/menu/update_profile/models/doc_type_response_mod
 import 'package:uremit/features/menu/update_profile/models/get_countries_response_model.dart';
 import 'package:uremit/features/payment/pay_id/modal/insert_payment_proof_response_modal.dart';
 import 'package:uremit/features/payment/pay_id/modal/insert_payment_response_request_modal.dart';
+import 'package:uremit/features/payment/payment_details/models/get_receiver_currencies_request_model.dart';
+import 'package:uremit/features/payment/payment_details/models/get_receiver_currencies_response_model.dart';
+import 'package:uremit/features/payment/payment_details/models/update_transaction_status_request_model.dart';
+import 'package:uremit/features/payment/payment_details/models/update_transaction_status_response_model.dart';
 import 'package:uremit/features/payment/personal_info/models/set_profile_details_request_model.dart';
-import 'package:uremit/features/payment/receipt_screen/modal/getPaymentMethodResponseModal.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_Payment_Method_Response_Model.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_transaction_by%20_txn_response_model.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_transaction_by_txn_request_model.dart';
 import 'package:uremit/features/payment/receipt_screen/modal/insert_payment_transfer_request_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_administrative_charges_list_response_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_admistrative_charges_list_request_model.dart';
 import 'package:uremit/features/payment/receiver_info/models/receiver_add_request_list_model.dart';
 import 'package:uremit/features/receivers/models/add_receiver_bank_request_model.dart';
 import 'package:uremit/features/receivers/models/add_receiver_bank_response_model.dart';
@@ -52,10 +62,14 @@ import 'package:uremit/features/receivers/models/delete_receiver_request_model.d
 import 'package:uremit/features/receivers/models/delete_receiver_response_model.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_request_model.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_response_model.dart';
+import 'package:uremit/features/receivers/models/payment_header_request_model.dart';
+import 'package:uremit/features/receivers/models/payment_header_response_model.dart';
 import 'package:uremit/features/receivers/models/receiver_list_request_model.dart';
 import 'package:uremit/features/receivers/models/receiver_list_response_model.dart';
 import 'package:uremit/features/receivers/models/update_receiver_nickname_request_model.dart';
 import 'package:uremit/features/receivers/models/update_receiver_nickname_response_model.dart';
+import 'package:uremit/features/receivers/models/validate_bank_request_model.dart';
+import 'package:uremit/features/receivers/models/validate_bank_response_model.dart';
 import 'package:uremit/services/error/failure.dart';
 import 'package:uremit/services/models/no_params.dart';
 import 'package:uremit/utils/constants/app_level/app_messages.dart';
@@ -63,7 +77,9 @@ import 'package:uremit/utils/constants/app_level/app_messages.dart';
 import '../../features/files/previous_files/models/get_previous_file_response_model.dart';
 import '../../features/files/previous_files/models/get_previous_files_request_model.dart';
 import '../../features/payment/payment_details/models/get_rate_lists_response_model.dart';
+import '../../features/payment/receipt_screen/modal/get_payment_methods_request_model.dart';
 import '../../features/payment/receipt_screen/modal/insert_payment_response_modal.dart';
+import '../../features/payment/receiver_info/models/get_uremit_banks_countires_response_model.dart';
 import '../../features/payment/receiver_info/models/receiver_add_request_list_model.dart';
 import '../../features/payment/receiver_info/models/receiver_add_response_list_model.dart';
 import '../../utils/data_sources/auth_data_source.dart';
@@ -86,7 +102,8 @@ class RepositoryImp extends Repository {
   });
 
   @override
-  Future<Either<Failure, RegistrationResponseModel>> registerUser(RegistrationRequestModel params) async {
+  Future<Either<Failure, RegistrationResponseModel>> registerUser(
+      RegistrationRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -100,7 +117,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, LoginResponseModel>> loginUser(LoginRequestModel params) async {
+  Future<Either<Failure, LoginResponseModel>> loginUser(
+      LoginRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -115,7 +133,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, LogoutResponseModel>> logoutUser(LogoutRequestModel params) async {
+  Future<Either<Failure, LogoutResponseModel>> logoutUser(
+      LogoutRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -129,7 +148,8 @@ class RepositoryImp extends Repository {
     }
   }
 
-  Future<Either<Failure, DocumentRequiredResponseModel>> docRequired(DocumentRequiredRequestModel params) async {
+  Future<Either<Failure, DocumentRequiredResponseModel>> docRequired(
+      DocumentRequiredRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -144,7 +164,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ResetPasswordResponseModel>> resetPassword(ResetPasswordRequestModel params) async {
+  Future<Either<Failure, ResetPasswordResponseModel>> resetPassword(
+      ResetPasswordRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -158,7 +179,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, NoParams>> forgotPassword(ForgotPasswordRequestModel params) async {
+  Future<Either<Failure, NoParams>> forgotPassword(
+      ForgotPasswordRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -172,7 +194,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ValidateOtpResponseModel>> validateOtp(ValidateOtpRequestModel params) async {
+  Future<Either<Failure, ValidateOtpResponseModel>> validateOtp(
+      ValidateOtpRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -186,7 +209,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetCountriesResponseModel>> getCountries(NoParams params) async {
+  Future<Either<Failure, GetCountriesResponseModel>> getCountries(
+      NoParams params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -200,7 +224,23 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetRateListResponseModel>> getShortRateList(NoParams params) async {
+  Future<Either<Failure, GetUremitBanksCountriesResponseModel>>
+      getUremitBanksCountries(NoParams params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.getUremitBanksCountries(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetRateListResponseModel>> getShortRateList(
+      NoParams params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -214,7 +254,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetPaymentRateListResponseModal>> getRateLists(NoParams params) async {
+  Future<Either<Failure, GetPaymentRateListResponseModal>> getRateLists(
+      NoParams params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -229,7 +270,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, NoParams>> generateOtp(GenerateOtpRequestModel params) async {
+  Future<Either<Failure, NoParams>> generateOtp(
+      GenerateOtpRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -243,7 +285,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetAllCardsResponseModel>> getAllCards(GetAllCardsRequestModel params) async {
+  Future<Either<Failure, GetAllCardsResponseModel>> getAllCards(
+      GetAllCardsRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -257,7 +300,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, DeleteCardResponseModel>> deleteCard(DeleteCardRequestModel params) async {
+  Future<Either<Failure, DeleteCardResponseModel>> deleteCard(
+      DeleteCardRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -271,7 +315,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ChangePasswordResponseModel>> changePassword(ChangePasswordRequestModel params) async {
+  Future<Either<Failure, ChangePasswordResponseModel>> changePassword(
+      ChangePasswordRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -285,7 +330,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetProfileDetailsResponseModel>> getProfileDetails(GetProfileDetailsRequestModel params) async {
+  Future<Either<Failure, GetProfileDetailsResponseModel>> getProfileDetails(
+      GetProfileDetailsRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -299,7 +345,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ProfileHeaderResponseModel>> profileHeader(ProfileHeaderRequestModel params) async {
+  Future<Either<Failure, ProfileHeaderResponseModel>> profileHeader(
+      ProfileHeaderRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -313,7 +360,23 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetPromotionListResponseModel>> getPromotionList(GetPromotionListRequestModel params) async {
+  Future<Either<Failure, GetProfileAdminApprovelResponseModel>>
+      profileAdminApprovel(GetProfileAdminApprovelRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.adminProfileApprovel(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetPromotionListResponseModel>> getPromotionList(
+      GetPromotionListRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -327,7 +390,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetPreviousFileResponseModel>> getPreviousFiles(GetPreviousFilesRequestModel params) async {
+  Future<Either<Failure, GetPreviousFileResponseModel>> getPreviousFiles(
+      GetPreviousFilesRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -341,7 +405,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetProfileDetailsResponseModel>> setProfileDetails(SetProfileDetailsRequestModel params) async {
+  Future<Either<Failure, GetProfileDetailsResponseModel>> setProfileDetails(
+      SetProfileDetailsRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -357,7 +422,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ReceiverListResponseModel>> receiverList(ReceiverListRequestModel params) async {
+  Future<Either<Failure, ReceiverListResponseModel>> receiverList(
+      ReceiverListRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -371,7 +437,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ProfileImageResponseModel>> profileImage(ProfileImageRequestModel params) async {
+  Future<Either<Failure, ProfileImageResponseModel>> profileImage(
+      ProfileImageRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -385,7 +452,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, AddReceiverBankResponseModel>> addReceiverBank(AddReceiverBankRequestModel params) async {
+  Future<Either<Failure, AddReceiverBankResponseModel>> addReceiverBank(
+      AddReceiverBankRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -399,7 +467,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, DeleteReceiverResponseModel>> deleteReceiver(DeleteReceiverRequestModel params) async {
+  Future<Either<Failure, DeleteReceiverResponseModel>> deleteReceiver(
+      DeleteReceiverRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -413,7 +482,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, DeleteReceiverBankListResponseModel>> deleteReceiverBank(DeleteReceiverBankListRequestModel params) async {
+  Future<Either<Failure, DeleteReceiverBankListResponseModel>>
+      deleteReceiverBank(DeleteReceiverBankListRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -427,7 +497,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetBankListResponseModel>> getBankList(GetBankListRequestModel params) async {
+  Future<Either<Failure, GetBankListResponseModel>> getBankList(
+      GetBankListRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -441,7 +512,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, ReceiverAddResponseListModel>> receiverAdd(ReceiverAddRequestListModel params) async {
+  Future<Either<Failure, ReceiverAddResponseListModel>> receiverAdd(
+      ReceiverAddRequestListModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -455,7 +527,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, UpdateReceiverNicknameResponseModel>> updateReceiverNickname(UpdateReceiverNicknameRequestModel params) async {
+  Future<Either<Failure, UpdateReceiverNicknameResponseModel>>
+      updateReceiverNickname(UpdateReceiverNicknameRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -469,7 +542,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetRequiredFileResponseModel>> getRequiredFiles(GetRequiredFileRequestModel params) async {
+  Future<Either<Failure, GetRequiredFileResponseModel>> getRequiredFiles(
+      GetRequiredFileRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -483,7 +557,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, CountriesProvinceResponseModel>> getCountryProvinces(CountriesProvinceRequestModel params) async {
+  Future<Either<Failure, CountriesProvinceResponseModel>> getCountryProvinces(
+      CountriesProvinceRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -497,7 +572,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, DocTypeResponseModel>> getDocTypes(DocTypeRequestModel params) async {
+  Future<Either<Failure, DocTypeResponseModel>> getDocTypes(
+      DocTypeRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -511,7 +587,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, InsertPaymentTransferResponseModal>> insertPaymentTransfer(InsertPaymentTransferRequestModel params) async {
+  Future<Either<Failure, InsertPaymentTransferResponseModal>>
+      insertPaymentTransfer(InsertPaymentTransferRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -525,7 +602,23 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetPaymentMethodResponseModal>> getPaymentMethods(NoParams params) async {
+  Future<Either<Failure, InsertPaymentTransferResponseModal>> updatePayment(
+      InsertPaymentTransferRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.updatePayment(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetPaymentMethodResponseModal>> getPaymentMethods(
+      GetPaymentMethodsRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -539,7 +632,8 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, InsertPaymentProofResponseModal>> insertPaymentProof(InsertPaymentProofRequestModal params) async {
+  Future<Either<Failure, InsertPaymentProofResponseModal>> insertPaymentProof(
+      InsertPaymentProofRequestModal params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -552,7 +646,8 @@ class RepositoryImp extends Repository {
     }
   }
 
-  Future<Either<Failure, DocumentRequiredResponseModel>> documentRequired(DocumentRequiredRequestModel params) async {
+  Future<Either<Failure, DocumentRequiredResponseModel>> documentRequired(
+      DocumentRequiredRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
@@ -566,12 +661,105 @@ class RepositoryImp extends Repository {
   }
 
   @override
-  Future<Either<Failure, GetTransactionListResponseModel>> getTransactionList(GetTransactionListRequestModel params) async {
+  Future<Either<Failure, GetTransactionListResponseModel>> getTransactionList(
+      GetTransactionListRequestModel params) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure(AppMessages.noInternet));
     }
     try {
       return Right(await remoteDataSource.getTransactionList(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ValidateBankResponseModel>> validateBank(
+      ValidateBankRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.validateBank(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UpdateTransactionStatusResponseModel>>
+      updateTransactionStatus(
+          UpdateTransactionStatusRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.updateTransactionStatus(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PaymentHeaderResponseModel>> getPaymentHeaderDetails(
+      PaymentHeaderRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.getPaymentHeaderDetails(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetAdministrativeChargesListResponseModel>>
+      getAdministrativeChargesLists(
+          GetAdministrativeChargesListRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.getAdministrativeChargesList(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetReceiverCurrenciesResponseModel>>
+      getReceiverCurrencies(GetReceiverCurrenciesRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.getReceiverCurrencies(params));
+    } on Failure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetTransactionByTxnResponseModel>> getTransactionByTxn(
+      GetTransactionByTxnRequestModel params) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure(AppMessages.noInternet));
+    }
+    try {
+      return Right(await remoteDataSource.getTransactionByTxn(params));
     } on Failure catch (e) {
       return Left(e);
     } catch (e) {

@@ -40,20 +40,22 @@ class PolyResponseBody {
     required this.errorCode,
     required this.errorMessage,
     required this.transactionRefNo,
+    required this.txn,
   });
   late final String success;
   late final String navigateURL;
   late final String errorCode;
   late final String errorMessage;
   late final String transactionRefNo;
+  late final String txn;
 
   PolyResponseBody.fromJson(Map<String, dynamic> json){
-    Logger().i(json);
     success = json['success'].toString();
     navigateURL = json['navigateURL'];
     errorCode = json['errorCode'].toString();
     errorMessage = json['errorMessage']??'';
     transactionRefNo = json['transactionRefNo']??'';
+    txn = json['txn']??'';
   }
 
 
@@ -65,6 +67,7 @@ class PolyResponseBody {
     _data['errorCode'] = errorCode;
     _data['errorMessage'] = errorMessage;
     _data['transactionRefNo'] = transactionRefNo;
+    _data['txn'] = txn;
     return _data;
   }
 }

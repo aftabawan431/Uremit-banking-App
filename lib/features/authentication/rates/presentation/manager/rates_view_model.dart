@@ -2,6 +2,7 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:uremit/features/authentication/auth_wrapper/presentation/manager/auth_wrapper_view_model.dart';
 import 'package:uremit/features/authentication/rates/models/get_rate_list_response_model.dart';
 import 'package:uremit/features/authentication/rates/usecases/get_rate_list_usecase.dart';
@@ -24,7 +25,8 @@ class RatesViewModel extends ChangeNotifier {
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> sendEnabledNotifier = ValueNotifier(true);
-  ValueNotifier<String> prefixIconPathNotifier = ValueNotifier(AppAssets.icCountrySvg);
+  ValueNotifier<String> prefixIconPathNotifier =
+      ValueNotifier(AppAssets.icCountrySvg);
   ValueNotifier<bool> networkPrefixNotifier = ValueNotifier(false);
   ValueNotifier<String> exchangeRateNotifier = ValueNotifier('');
   ValueNotifier<String> destinationNationCurrencyNotifier = ValueNotifier('');
@@ -34,10 +36,12 @@ class RatesViewModel extends ChangeNotifier {
 
   // Properties
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> ratesFormKey = GlobalKey<FormState>();
 
   final String destinationCountryLabelText = 'Destination Country';
   final String destinationCountryHintText = 'Select Destination Country';
-  final TextEditingController destinationCountryController = TextEditingController();
+  final TextEditingController destinationCountryController =
+      TextEditingController();
   final FocusNode destinationCountryFocusNode = FocusNode();
 
   final String sendMoneyLabelText = 'Send Money';
@@ -50,7 +54,8 @@ class RatesViewModel extends ChangeNotifier {
   final TextEditingController receivedMoneyController = TextEditingController();
   final FocusNode receivedMoneyFocusNode = FocusNode();
 
-  final CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(locale: 'en_AU', decimalDigits: 0, symbol: 'AUD ');
+  final CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(
+      locale: 'en_AU', decimalDigits: 0, symbol: 'AUD ');
 
   GetRateListResponseModel? rateList;
 
@@ -82,6 +87,15 @@ class RatesViewModel extends ChangeNotifier {
     }
   }
 
+  void resetFields() {
+    destinationCountryController.clear();
+    sendMoneyController.clear();
+    receivedMoneyController.clear();
+    networkPrefixNotifier.value = false;
+    exchangeRateNotifier.value = '';
+    prefixIconPathNotifier.value = AppAssets.icCountrySvg;
+  }
+
   // Methods
   void onSendMoneySubmitted(BuildContext context) {
     FocusScope.of(context).requestFocus(FocusNode());
@@ -92,13 +106,16 @@ class RatesViewModel extends ChangeNotifier {
     if (rateList == null || selectedCountryIndex == -1) {
       return;
     }
-    sendEnabledNotifier.value = selectedCountryIndex != 1 && value.isNotEmpty;
+
+    sendEnabledNotifier.value = selectedCountryIndex != -1 && value.isNotEmpty;
     if (value.isEmpty) {
       receivedMoneyController.text = '';
       return;
     }
     double rate = double.parse(value);
-    receivedMoneyController.text = (rate * rateList!.rateListBody[selectedCountryIndex].exchangeRate).toStringAsFixed(2);
+    receivedMoneyController.text =
+        (rate * rateList!.rateListBody[selectedCountryIndex].exchangeRate)
+            .toStringAsFixed(2);
   }
 
   void send() {
@@ -118,7 +135,9 @@ class RatesViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
   // Page Moves

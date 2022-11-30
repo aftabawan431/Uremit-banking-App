@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:uremit/features/payment/receipt_screen/modal/getPaymentMethodResponseModal.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_Payment_Method_Response_Model.dart';
 class PaymentMethodWidget extends StatelessWidget {
   const PaymentMethodWidget({required this.paymentMethod, Key? key}) : super(key: key);
   final PaymentMethodBody paymentMethod;
@@ -29,7 +29,7 @@ class PaymentMethodWidget extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 16
                   ),),
-                  Text('${paymentMethod.charges} AUD in total fees',style: const TextStyle(fontSize: 12,color: Colors.white),),
+                  Text('${paymentMethod.charges} AUD in total fee',style: const TextStyle(fontSize: 12,color: Colors.white),),
                   const SizedBox(height: 5,),
                   Text(paymentMethod.description,style: const TextStyle(color: Colors.white,fontSize: 12),)
 

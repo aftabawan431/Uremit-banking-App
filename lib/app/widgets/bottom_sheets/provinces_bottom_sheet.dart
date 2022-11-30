@@ -32,9 +32,9 @@ class ProvincesBottomSheet {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Select Province', style: Theme.of(context).textTheme.subtitle1),
+                Text('Select State', style: Theme.of(context).textTheme.subtitle1),
                 SizedBox(height: 3.h),
-                Text('Select province from ${country.countryName}', style: Theme.of(context).textTheme.bodyText2),
+                Text('Select state from ${country.countryName}', style: Theme.of(context).textTheme.bodyText2),
                 SizedBox(height: 22.h),
                 Expanded(
                   child: ValueListenableBuilder<bool>(

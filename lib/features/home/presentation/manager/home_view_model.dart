@@ -6,12 +6,14 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:logger/logger.dart';
 import 'package:uremit/app/models/profile_header_request_model.dart';
 import 'package:uremit/app/models/profile_header_response_model.dart';
 import 'package:uremit/app/usecases/profile_header_usecase.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approval_response_model.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approvel_request_model.dart';
 import 'package:uremit/services/models/on_error_message_model.dart';
 import 'package:uremit/utils/constants/enums/page_state_enum.dart';
 import 'package:uremit/utils/router/models/page_action.dart';
@@ -24,25 +26,33 @@ import '../../../../utils/router/app_state.dart';
 import '../../../../utils/router/models/page_config.dart';
 import '../../../cards/presentation/pages/cards_page.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
+import '../../../receivers/presentation/manager/receiver_view_model.dart';
 import '../../../receivers/presentation/pages/receiver_page.dart';
 import '../../models/profile_image_request_model.dart';
+import '../../usecases/get_profile_admin_approvel_usecase.dart';
 import '../../usecases/profile_image_usecase.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel({required this.profileHeaderUsecase, required this.profileImageUsecase});
+  HomeViewModel(
+      {required this.profileHeaderUsecase,
+      required this.profileImageUsecase,
+      required this.getProfileAdminApprovelUsecase});
 
   // Usecases
   ProfileHeaderUsecase profileHeaderUsecase;
+  GetProfileAdminApprovelUsecase getProfileAdminApprovelUsecase;
   ProfileImageUsecase profileImageUsecase;
   // Value Notifiers
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
   ValueNotifier<int> pageIndex = ValueNotifier(0);
   ValueNotifier<bool> fabClicked = ValueNotifier(false);
-  ValueNotifier<List<ProfileHeaderBody>> profileDetailsNotifier = ValueNotifier([]);
+  ValueNotifier<List<ProfileHeaderBody>> profileDetailsNotifier =
+      ValueNotifier([]);
 
   // Properties
   PageController pageController = PageController();
+  GetProfileAdminApprovelResponseModel? getProfileAdminApprovalResponseModel;
 
   final pages = const [
     DashboardPage(),
@@ -68,7 +78,8 @@ class HomeViewModel extends ChangeNotifier {
 
     isLoadingNotifier.value = true;
 
-    ProfileHeaderRequestModel params = ProfileHeaderRequestModel(userId: _accountProvider.userDetails!.userDetails.id);
+    ProfileHeaderRequestModel params = ProfileHeaderRequestModel(
+        userId: _accountProvider.userDetails!.userDetails.id);
 
     var profileHeaderEither = await profileHeaderUsecase.call(params);
 
@@ -83,14 +94,31 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> getProfileAdminApprovel() async {
+    GetProfileAdminApprovelRequestModel params =
+        GetProfileAdminApprovelRequestModel(
+            id: _accountProvider.userDetails!.userDetails.id);
+
+    var profileHeaderEither = await getProfileAdminApprovelUsecase.call(params);
+
+    if (profileHeaderEither.isLeft()) {
+      handleError(profileHeaderEither);
+    } else if (profileHeaderEither.isRight()) {
+      profileHeaderEither.foldRight(null, (response, _) {
+        getProfileAdminApprovalResponseModel = response;
+      });
+    }
+  }
+
   clearData() {
     profileHeader = null;
   }
 
   ValueNotifier<bool> profileImageNotifier = ValueNotifier(false);
   Future<void> setProfileImage(BuildContext context) async {
-    var params = ProfileImageRequestModel(userId: _accountProvider.userDetails!.userDetails.id.toString(), image: profileImg.toString());
-
+    var params = ProfileImageRequestModel(
+        userId: _accountProvider.userDetails!.userDetails.id.toString(),
+        image: profileImg.toString());
 
     var updateEither = await profileImageUsecase(params);
 
@@ -100,13 +128,20 @@ class HomeViewModel extends ChangeNotifier {
       handleError(updateEither);
     } else if (updateEither.isRight()) {
       updateEither.foldRight(null, (response, previous) {
-        updateEither.foldRight(null, (response, _) async{
-          Logger().w('Success');
-          HomeViewModel homeViewModel=sl();
-         await homeViewModel.getProfileHeader(recall: true);
-          profileImgFile.value=null;
+        updateEither.foldRight(null, (response, _) async {
+          Fluttertoast.showToast(
+              msg: 'Updated',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 12.0);
+          HomeViewModel homeViewModel = sl();
+          await homeViewModel.getProfileHeader(recall: true);
+          profileImgFile.value = null;
 
-          onErrorMessage?.call(OnErrorMessageModel(message: 'Updated', backgroundColor: Colors.green));
+          // onErrorMessage?.call(OnErrorMessageModel(message: 'Updated', backgroundColor: Colors.green));
         });
         profileImageNotifier.value = false;
       });
@@ -121,16 +156,19 @@ class HomeViewModel extends ChangeNotifier {
   final TextEditingController profileImgController = TextEditingController();
   String profileImgId = '';
   // Methods
-  Future<void> pickFiles(BuildContext context, AttachmentType type, String source) async {
+  Future<void> pickFiles(
+      BuildContext context, AttachmentType type, String source) async {
     selectedFile = null;
 
     try {
       switch (source) {
         case 'camera':
-          selectedFile = (await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 50));
+          selectedFile = (await ImagePicker()
+              .pickImage(source: ImageSource.camera, imageQuality: 50));
           break;
         case 'gallery':
-          selectedFile = (await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50));
+          selectedFile = (await ImagePicker()
+              .pickImage(source: ImageSource.gallery, imageQuality: 50));
           break;
       }
 
@@ -141,7 +179,8 @@ class HomeViewModel extends ChangeNotifier {
           switch (type) {
             case AttachmentType.profileImage:
               profileImg = base64;
-              profileImgController.text = profileImgFile.value!.path.split('/').last;
+              profileImgController.text =
+                  profileImgFile.value!.path.split('/').last;
               print('this is the name of the pic ${profileImgController.text}');
               break;
           }
@@ -155,7 +194,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> profileImageSelector(context) async {
-    showModalBottomSheet(
+    await showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context,
         builder: (BuildContext context) {
@@ -170,8 +209,9 @@ class HomeViewModel extends ChangeNotifier {
                       color: Colors.orange,
                     ),
                     title: const Text('Camera'),
-                    onTap: () {
-                      pickFiles(context, AttachmentType.profileImage, 'camera');
+                    onTap: () async {
+                      await pickFiles(
+                          context, AttachmentType.profileImage, 'camera');
                       Navigator.of(context).pop();
                     },
                   ),
@@ -181,8 +221,9 @@ class HomeViewModel extends ChangeNotifier {
                         color: Colors.orange,
                       ),
                       title: const Text('Pick From Gallery'),
-                      onTap: () {
-                        pickFiles(context, AttachmentType.profileImage, 'gallery');
+                      onTap: () async {
+                        await pickFiles(
+                            context, AttachmentType.profileImage, 'gallery');
                         Navigator.of(context).pop();
                       }),
                 ],
@@ -204,16 +245,20 @@ class HomeViewModel extends ChangeNotifier {
     fabClicked.value = false;
     pageIndex.value = index;
     if (index > 1) {
-      pageController.animateToPage(index + 1, duration: const Duration(seconds: 1), curve: Curves.ease);
+      pageController.animateToPage(index + 1,
+          duration: const Duration(seconds: 1), curve: Curves.ease);
     } else {
-      pageController.animateToPage(index, duration: const Duration(seconds: 1), curve: Curves.ease);
+      pageController.animateToPage(index,
+          duration: const Duration(seconds: 1), curve: Curves.ease);
     }
   }
 
   void onFabTap() {
+    ReceiverViewModel receiverViewModel = sl();
+    receiverViewModel.isPaymentReceiver = true;
     AppState appState = sl();
-    appState.currentAction = PageAction(state: PageState.addPage, page: PageConfigs.paymentWrapperPageConfig);
-
+    appState.currentAction = PageAction(
+        state: PageState.addPage, page: PageConfigs.paymentWrapperPageConfig);
     fabClicked.value = true;
     Timer(const Duration(milliseconds: 400), () {
       fabClicked.value = false;
@@ -225,13 +270,16 @@ class HomeViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
   // Page Moves
   void moveToAuthWrapperPage() {
     Timer(const Duration(seconds: 5), () {
-      appState.currentAction = PageAction(state: PageState.replaceAll, page: PageConfigs.authWrapperPageConfig);
+      appState.currentAction = PageAction(
+          state: PageState.replaceAll, page: PageConfigs.authWrapperPageConfig);
     });
   }
 }

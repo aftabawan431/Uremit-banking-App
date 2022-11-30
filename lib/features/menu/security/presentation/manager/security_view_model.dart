@@ -70,7 +70,6 @@ class SecurityViewModel extends ChangeNotifier {
       oldPassword: oldPasswordController.text,
       newPassword: confirmPasswordController.text,
     );
-
     var changePasswordEither = await changePasswordUsecase.call(params);
 
     if (changePasswordEither.isLeft()) {
@@ -82,6 +81,7 @@ class SecurityViewModel extends ChangeNotifier {
     } else if (changePasswordEither.isRight()) {
       isOldPasswordError = false;
       isPasswordIncorrect.value = false;
+      FocusScope.of(context).unfocus();
       Navigator.of(context).pop();
       isPasswordStrengthVisible.value = false;
       clearFields();

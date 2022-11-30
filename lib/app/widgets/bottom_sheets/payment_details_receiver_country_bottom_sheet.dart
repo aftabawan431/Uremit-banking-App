@@ -80,11 +80,12 @@ class ReceiverCountriesBottomSheet {
                                     ),
                                     title: Text(context.read<PaymentDetailsViewModel>().countriesList[index].country.name, style: Theme.of(context).textTheme.bodyText2),
                                     onTap: () {
-                                      print(context.read<PaymentDetailsViewModel>().paymentList);
+
                                       if (type == 0) {
                                         context.read<PaymentDetailsViewModel>().receiverCountryController.text =
                                             context.read<PaymentDetailsViewModel>().countriesList[index].country.name;
                                         context.read<PaymentDetailsViewModel>().receiverCountry = context.read<PaymentDetailsViewModel>().countriesList[index].country;
+                                        context.read<PaymentDetailsViewModel>().getReceiverCurrencies(context.read<PaymentDetailsViewModel>().countriesList[index].country.id);
                                       }
                                       Navigator.of(context).pop();
                                     },

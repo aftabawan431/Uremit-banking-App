@@ -7,7 +7,9 @@ import 'package:uremit/utils/router/app_state.dart';
 import '../../../utils/constants/app_level/app_assets.dart';
 
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
-  const CustomAppBar({required this.title, this.showBackButton = true, Key? key}) : super(key: key);
+  const CustomAppBar(
+      {required this.title, this.showBackButton = true, Key? key})
+      : super(key: key);
 
   final String title;
   final bool showBackButton;
@@ -25,16 +27,19 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
               child: CircleAvatar(
                 radius: 10.r,
                 backgroundColor: Colors.white.withOpacity(0.85),
-                child: Icon(Icons.chevron_left_rounded, color: Theme.of(context).primaryColor),
+                child: Icon(Icons.chevron_left_rounded,
+                    color: Theme.of(context).primaryColor),
               ),
             )
           : null,
       title: Padding(
         padding: EdgeInsets.only(left: showBackButton ? 0 : 20),
-        child: Text(title, style: Theme.of(context).textTheme.subtitle2?.copyWith(color: Colors.white.withOpacity(0.85))),
+        child: Text(title,
+            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                color: Colors.white.withOpacity(0.85), fontSize: 17.sp)),
       ),
       actions: [
-        SvgPicture.asset(AppAssets.uremitSvg, width: 75.w),
+        SvgPicture.asset(AppAssets.uremitSvg, width: 60.w),
         SizedBox(width: 22.w),
       ],
     );

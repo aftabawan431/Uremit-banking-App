@@ -34,20 +34,27 @@ class TransectionThreeSixtyResponseModal {
 class TransectionThreeSixtyBody {
   TransectionThreeSixtyBody({
     required this.checkout,
+    required this.txn,
   });
   final Checkout checkout;
+  final String txn;
 
   factory TransectionThreeSixtyBody.fromJson(Map<String, dynamic> json) {
     return TransectionThreeSixtyBody(
-        checkout: Checkout.fromJson(json['checkout']));
+        checkout: Checkout.fromJson(json['checkout']),
+        txn:json['txn']
+
+    );
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['checkout'] = checkout.toJson();
+    _data['txn'] =txn;
     return _data;
   }
 }
+
 
 class Checkout {
   Checkout({

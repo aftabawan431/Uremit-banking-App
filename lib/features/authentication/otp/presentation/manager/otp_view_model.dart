@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:logger/logger.dart';
 import 'package:uremit/features/authentication/auth_wrapper/presentation/manager/auth_wrapper_view_model.dart';
 import 'package:uremit/features/authentication/forgot_password/models/validate_otp_request_model.dart';
 import 'package:uremit/features/authentication/forgot_password/usecases/validate_otp_usecase.dart';
@@ -32,9 +32,10 @@ class OtpViewModel extends ChangeNotifier {
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
 
+
   // Properties
   final TextEditingController otpController = TextEditingController();
-  final StreamController<ErrorAnimationType> errorStream = StreamController<ErrorAnimationType>.broadcast();
+  // final StreamController<ErrorAnimationType> errorStream = StreamController<ErrorAnimationType>.broadcast();
 
   // Getters
   AppState appState = GetIt.I.get<AppState>();
@@ -43,7 +44,7 @@ class OtpViewModel extends ChangeNotifier {
   AuthWrapperViewModel get _authWrapperViewModel => sl();
 
   // Usecase Calls
-  Future<void> validateOtp() async {
+  Future<void> validateOtp(String otp) async {
     isLoadingNotifier.value = true;
 
     var pageIndex = _authWrapperViewModel.currentIndex;
@@ -53,7 +54,7 @@ class OtpViewModel extends ChangeNotifier {
       return;
     }
 
-    var params = ValidateOtpRequestModel(otpCode: otpController.text, otpType: 2, email: email);
+    var params = ValidateOtpRequestModel(otpCode: otp, otpType: 1, email: email);
 
     var validateOtpEither = await validateOtpUsecase.call(params);
 
@@ -63,9 +64,10 @@ class OtpViewModel extends ChangeNotifier {
     } else if (validateOtpEither.isRight()) {
       validateOtpEither.foldRight(null, (response, _) {
         if (response.otpBody.result) {
+          _registrationViewModel.clearFields();
           _loginViewModel.clearFields();
           onErrorMessage?.call(OnErrorMessageModel(message: 'Account Verified', backgroundColor: Colors.green));
-
+          otpController.clear();
           if (pageIndex == 0) {
             otpController.clear();
             sessionTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -75,9 +77,7 @@ class OtpViewModel extends ChangeNotifier {
                 await _loginViewModel.logOut();
                 onErrorMessage?.call(OnErrorMessageModel(message: 'session expired login again', backgroundColor: Colors.grey));
                 appState.currentAction = PageAction(state: PageState.replaceAll, page: PageConfigs.authWrapperPageConfig);
-
                 // move user to login
-
               }
             });
             moveToHomePage();
@@ -86,23 +86,31 @@ class OtpViewModel extends ChangeNotifier {
           }
         } else {
           onErrorMessage?.call(OnErrorMessageModel(message: 'Invalid OTP'));
-          errorStream.sink.add(ErrorAnimationType.shake);
+          // errorStream.sink.add(ErrorAnimationType.shake);
         }
       });
       isLoadingNotifier.value = false;
     }
   }
-
+  bool otpTimer =true;
+  startTimer()async{
+    otpTimer =false;
+    notifyListeners();
+  }
+  otpTimerChange(bool value){
+    otpTimer=value;
+    notifyListeners();
+  }
   Future<void> generateOtp() async {
     isLoadingNotifier.value = true;
-
+    otpTimerChange(true);
     var email = _getEmail();
 
     if (email.isEmpty) {
       return;
     }
 
-    var params = GenerateOtpRequestModel(email);
+    var params = GenerateOtpRequestModel(email, 1);
 
     var generateOtpEither = await generateOtpUsecase.call(params);
 
@@ -116,11 +124,18 @@ class OtpViewModel extends ChangeNotifier {
   }
 
   // Methods
-  void onCompleted(String value) {
-    validateOtp();
-  }
+  // void onCompleted(String value) {
+  //   isLoadingNotifier.value = false;
+  //   Logger().w(value);
+  //   validateOtp(value);
+  // }
 
-  void onChanged(String value) {}
+  void onChanged(String value) {
+    if (value.length == 4) {
+      Logger().v(value);
+      validateOtp(value);
+    }
+  }
 
   bool beforeTextPaste(String? value) {
     return true;
@@ -144,6 +159,10 @@ class OtpViewModel extends ChangeNotifier {
 
   // Page Moves
   void moveToAuthWrapperPage() {
+    AppState appState = sl();
+    appState.moveToBackScreen();
+    _authWrapperViewModel.bottomNavigationKey.currentState!.setPage(0);
+
     appState.currentAction = PageAction(state: PageState.replaceAll, page: PageConfigs.authWrapperPageConfig);
   }
 

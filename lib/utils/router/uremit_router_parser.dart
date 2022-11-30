@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uremit/utils/router/models/page_paths.dart';
-import 'package:uremit/utils/router/pages.dart';
 
 import 'models/page_config.dart';
+import 'pages.dart';
 
 class UremitRouterParser extends RouteInformationParser<PageConfiguration> {
   @override
@@ -69,6 +69,8 @@ class UremitRouterParser extends RouteInformationParser<PageConfiguration> {
         return const RouteInformation(location: PagePaths.addReceiverInfoPagePath);
       case Pages.summaryDetailsScreen:
         return const RouteInformation(location: PagePaths.addReceiverInfoPagePath);
+      case Pages.webViewPage:
+        return const RouteInformation(location: PagePaths.webViewPagePath);
     }
   }
 }

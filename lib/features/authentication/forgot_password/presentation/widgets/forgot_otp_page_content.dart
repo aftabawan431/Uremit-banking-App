@@ -5,6 +5,7 @@ import 'package:uremit/app/widgets/customs/custom_app_bar.dart';
 import 'package:uremit/features/authentication/forgot_password/presentation/manager/forgot_password_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
 
+import '../../../../../app/globals.dart';
 import '../../../../../app/widgets/customs/custom_otp_fields.dart';
 
 class ForgotOtpPageContent extends StatefulWidget {
@@ -15,12 +16,23 @@ class ForgotOtpPageContent extends StatefulWidget {
 }
 
 class _ForgotOtpPageContentState extends State<ForgotOtpPageContent> {
+  ForgotPasswordViewModel forgotPasswordViewModel =sl();
+  startTimer() async {
+    Future.delayed(const Duration(seconds: 60), () {
+      forgotPasswordViewModel.startTimer();
+      return;
+    });
+  }
   @override
   void initState() {
     context.read<ForgotPasswordViewModel>().clearForgotOtpFields();
     context.read<ForgotPasswordViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+    startTimer();
+    print('this is the val ${forgotPasswordViewModel.otpTimer}');
+
     super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +48,9 @@ class _ForgotOtpPageContentState extends State<ForgotOtpPageContent> {
             child: Text('Forgot Password', style: Theme.of(context).textTheme.headline6?.copyWith(color: Colors.white)),
           ),
           SizedBox(height: 22.h),
-          Expanded(
+          Consumer<ForgotPasswordViewModel>(
+  builder: (_, provider, __) {
+  return Expanded(
             child: Container(
               padding: EdgeInsets.all(22.w),
               width: double.infinity,
@@ -61,7 +75,7 @@ class _ForgotOtpPageContentState extends State<ForgotOtpPageContent> {
                     SizedBox(height: 22.h),
                     CustomOtpFields(
                       controller: context.read<ForgotPasswordViewModel>().otpController,
-                      errorStream: context.read<ForgotPasswordViewModel>().errorStream,
+                      // errorStream: context.read<ForgotPasswordViewModel>().errorStream,
                       onChanged: context.read<ForgotPasswordViewModel>().onChanged,
                       onCompleted: context.read<ForgotPasswordViewModel>().onCompleted,
                       beforeTextPaste: context.read<ForgotPasswordViewModel>().beforeTextPaste,
@@ -83,10 +97,17 @@ class _ForgotOtpPageContentState extends State<ForgotOtpPageContent> {
                                     ),
                                   ),
                                 )
-                              : TextButton(
+                              :
+                          provider.otpTimer==true? Text('Wait until 30 seconds', style: Theme.of(context).textTheme.subtitle2):
+                          TextButton(
                                   onPressed: () async {
+
+                                    FocusScope.of(context).unfocus();
                                     context.read<ForgotPasswordViewModel>().otpController.clear();
+                                    provider.otpTimer==true;
+                                    startTimer();
                                     await context.read<ForgotPasswordViewModel>().generateOtp();
+
                                   },
                                   child: Text('Resend Code', style: Theme.of(context).textTheme.subtitle2),
                                   style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h), primary: Colors.transparent),
@@ -98,7 +119,9 @@ class _ForgotOtpPageContentState extends State<ForgotOtpPageContent> {
                 ),
               ),
             ),
-          ),
+          );
+  },
+),
         ],
       ),
     );

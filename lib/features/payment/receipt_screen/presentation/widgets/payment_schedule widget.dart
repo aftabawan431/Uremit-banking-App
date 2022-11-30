@@ -13,7 +13,7 @@ class PaymentSchduleWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         color: const Color(0xFFF7FCFF)
       ),
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           const Icon(Icons.calendar_today,color:  Colors.blue,),
@@ -22,7 +22,7 @@ class PaymentSchduleWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const[
-              Text("Schedule",style: TextStyle(fontWeight: FontWeight.bold),),
+              Text('Schedule',style: TextStyle(fontWeight: FontWeight.bold),),
               Text('or setup recurring transfer')
             ],),
           const Expanded(child: SizedBox.shrink()),

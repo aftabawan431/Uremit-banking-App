@@ -25,6 +25,7 @@ import 'package:uremit/features/files/files_wrapper/presentation/manager/files_w
 import 'package:uremit/features/files/previous_files/presentation/manager/previous_files_view_model.dart';
 import 'package:uremit/features/files/required_files/presentation/manager/required_file_view_model.dart';
 import 'package:uremit/features/files/required_files/usecases/get_required_file_usecase.dart';
+import 'package:uremit/features/home/usecases/get_profile_admin_approvel_usecase.dart';
 import 'package:uremit/features/home/usecases/profile_image_usecase.dart';
 import 'package:uremit/features/menu/documents/presentation/manager/documents_view_model.dart';
 import 'package:uremit/features/menu/documents/usecases/required_document_usecase.dart';
@@ -39,6 +40,9 @@ import 'package:uremit/features/payment/pay_id/use_cases/insert_payment_proof_us
 import 'package:uremit/features/payment/receipt_screen/presentation/manager/receipt_screen_view_model.dart';
 import 'package:uremit/features/payment/receipt_screen/usecases/getPaymentMethodsResponseUsecase.dart';
 import 'package:uremit/features/payment/receipt_screen/usecases/insert_payment_usecase.dart';
+import 'package:uremit/features/payment/receipt_screen/usecases/update_payment_usecase.dart';
+import 'package:uremit/features/payment/receiver_info/usecase/get_administrative_charges_list_usecase.dart';
+import 'package:uremit/features/receivers/usecases/payment_header_usecase.dart';
 import 'package:uremit/features/receivers/usecases/receiver_list_usecase.dart';
 
 import '../../app/globals.dart';
@@ -54,13 +58,18 @@ import '../../features/payment/credit_card_payment/presentation/manager/credit_c
 import '../../features/payment/pay_id/presentation/manager/pay_id_view_model.dart';
 import '../../features/payment/payment_details/presentation/manager/payment_details_view_model.dart';
 import '../../features/payment/payment_details/usecase/get_payment_rate_list_usecase.dart';
+import '../../features/payment/payment_details/usecase/get_receiver_currencies_usecase.dart';
+import '../../features/payment/payment_details/usecase/update_transaction_status_usecase.dart';
 import '../../features/payment/payment_wrapper/presentation/manager/payment_wrapper_view_model.dart';
 import '../../features/payment/personal_info/presentation/manager/personal_info_view_model.dart';
 import '../../features/payment/personal_info/usecase/set_profile_details_usecase.dart';
 import '../../features/payment/poli_payment/presentation/manager/poli_payment_view_model.dart';
 import '../../features/payment/receipt_screen/usecases/getPaymentMethodsResponseUsecase.dart';
+import '../../features/payment/receipt_screen/usecases/get_transaction_by_txn_usecase.dart';
 import '../../features/payment/receiver_info/presentation/manager/receiver_info_view_model.dart';
+import '../../features/payment/receiver_info/usecase/get_uremit_bank_countries_usecase.dart';
 import '../../features/payment/receiver_info/usecase/receiver_add_usecase.dart';
+import '../../features/payment/receiver_info/usecase/validate_bank_usecase.dart';
 import '../../features/receivers/presentation/manager/receiver_view_model.dart';
 import '../../features/receivers/usecases/add_receiver_bank_usecase.dart';
 import '../../features/receivers/usecases/delete_receiver_bank_usecase.dart';
@@ -85,6 +94,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ForgotPasswordUsecase(sl()));
   sl.registerLazySingleton(() => ValidateOtpUsecase(sl()));
   sl.registerLazySingleton(() => GetRateListUsecase(sl()));
+  sl.registerLazySingleton(() => UpdatePaymentUsecase(sl()));
   sl.registerLazySingleton(() => GetCountriesUsecase(sl()));
   sl.registerLazySingleton(() => GenerateOtpUsecase(sl()));
   sl.registerLazySingleton(() => GetAllCardsUsecase(sl()));
@@ -104,6 +114,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetPaymentMethodsReponseUsecase(sl()));
   sl.registerLazySingleton(() => DeleteReceiverUsecase(sl()));
   sl.registerLazySingleton(() => GetBankListUsecase(sl()));
+  sl.registerLazySingleton(() => GetReceiverCurrenciesUsecase(sl()));
 
   sl.registerLazySingleton(() => ReceiverAddUsecase(sl()));
   sl.registerLazySingleton(() => UpdateReceiverNicknameUsecase(sl()));
@@ -112,8 +123,14 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetPaymentRateListUsecase(sl()));
   sl.registerLazySingleton(() => RequiredDocumentUsecase(sl()));
   sl.registerLazySingleton(() => InsertPaymentProofUsecase(sl()));
-
+  sl.registerLazySingleton(() => GetUremitBanksCountriesUsecase(sl()));
+  sl.registerLazySingleton(() => GetTransactionByTxnUsecase(sl()));
+  sl.registerLazySingleton(() => ValidateBankUsecase(sl()));
   sl.registerLazySingleton(() => InsertPaymentUsecase(sl()));
+  sl.registerLazySingleton(() => UpdateTransactionStatusUsecase(sl()));
+  sl.registerLazySingleton(() => PaymentHeaderUsecase(sl()));
+  sl.registerLazySingleton(() => GetAdministrativeChargesListUsecase(sl()));
+  sl.registerLazySingleton(() => GetProfileAdminApprovelUsecase(sl()));
 
   /// Configs
   sl.registerLazySingleton(() => AccountProvider());
@@ -121,51 +138,93 @@ Future<void> init() async {
 
   /// Data Sources
   sl.registerLazySingleton<AuthDataSource>(() => AuthDataSourceImp(dio: sl()));
-  sl.registerLazySingleton<LocalDataSource>(() => LocalDataSourceImp(flutterSecureStorage: sl()));
-  sl.registerLazySingleton<RemoteDataSource>(() => RemoteDataSourceImp(dio: sl()));
+  sl.registerLazySingleton<LocalDataSource>(
+      () => LocalDataSourceImp(flutterSecureStorage: sl()));
+  sl.registerLazySingleton<RemoteDataSource>(
+      () => RemoteDataSourceImp(dio: sl()));
 
   /// Repository
-  sl.registerLazySingleton<Repository>(() => RepositoryImp(networkInfo: sl(), authDataSource: sl(), localDataSource: sl(), remoteDataSource: sl()));
+  sl.registerLazySingleton<Repository>(() => RepositoryImp(
+      networkInfo: sl(),
+      authDataSource: sl(),
+      localDataSource: sl(),
+      remoteDataSource: sl()));
 
   /// External
-  sl.registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker());
+  sl.registerLazySingleton<InternetConnectionChecker>(
+      () => InternetConnectionChecker());
   sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  // sl.registerLazySingleton(() => NetworkInfo());
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => DeviceInfoPlugin());
 
   /// Core
-  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
   /// View Models
-  sl.registerLazySingleton(() => SplashViewModel(deviceInfo: sl(), networkInfo: sl()));
+  sl.registerLazySingleton(
+      () => SplashViewModel(deviceInfo: sl(), networkInfo: sl()));
   sl.registerLazySingleton(() => AuthWrapperViewModel());
   sl.registerLazySingleton(() => LoginViewModel(sl(), sl()));
   sl.registerLazySingleton(() => RegistrationViewModel(sl()));
-  sl.registerLazySingleton(() => OtpViewModel(validateOtpUsecase: sl(), generateOtpUsecase: sl()));
-  sl.registerLazySingleton(() => ForgotPasswordViewModel(generateOtpUsecase: sl(), validateOtpUsecase: sl(), forgotPasswordUsecase: sl(), resetPasswordUsecase: sl()));
-  sl.registerLazySingleton(() => HomeViewModel(profileHeaderUsecase: sl(), profileImageUsecase: sl()));
-  sl.registerLazySingleton(() => DashboardViewModel(getPromotionListUsecase: sl(), getTransactionListUsecase: sl()));
-  sl.registerLazySingleton(() => ReceiverViewModel(sl(), sl(), sl(), sl(), sl()));
-  sl.registerLazySingleton(() => CardsViewModel(getAllCardsUsecase: sl(), deleteCardUsecase: sl()));
+  sl.registerLazySingleton(
+      () => OtpViewModel(validateOtpUsecase: sl(), generateOtpUsecase: sl()));
+  sl.registerLazySingleton(() => ForgotPasswordViewModel(
+      generateOtpUsecase: sl(),
+      validateOtpUsecase: sl(),
+      forgotPasswordUsecase: sl(),
+      resetPasswordUsecase: sl()));
+  sl.registerLazySingleton(() => HomeViewModel(
+      profileHeaderUsecase: sl(),
+      profileImageUsecase: sl(),
+      getProfileAdminApprovelUsecase: sl()));
+  sl.registerLazySingleton(() => DashboardViewModel(
+      getPromotionListUsecase: sl(), getTransactionListUsecase: sl()));
+  sl.registerLazySingleton(
+      () => ReceiverViewModel(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()));
+  sl.registerLazySingleton(
+      () => CardsViewModel(getAllCardsUsecase: sl(), deleteCardUsecase: sl()));
   sl.registerLazySingleton(() => RatesViewModel(sl()));
   sl.registerLazySingleton(() => AccountWrapperViewModel());
   sl.registerLazySingleton(() => ProfileViewModel(sl()));
-  sl.registerLazySingleton(() => UpdateProfileViewModel(getCountriesUsecase: sl(), countriesProvinceUsecase: sl(), docTypeUsecase: sl(), setProfileDetailsUsecase: sl()));
+  sl.registerLazySingleton(() => UpdateProfileViewModel(
+      getCountriesUsecase: sl(),
+      countriesProvinceUsecase: sl(),
+      docTypeUsecase: sl(),
+      setProfileDetailsUsecase: sl()));
   sl.registerFactory(() => SecurityViewModel(sl()));
-  sl.registerLazySingleton(() => DocumentsViewModel(docTypeUsecase: sl(), getCountriesUsecase: sl(), requiredDocumentUsecase: sl()));
+  sl.registerLazySingleton(() => DocumentsViewModel(
+      docTypeUsecase: sl(),
+      getCountriesUsecase: sl(),
+      requiredDocumentUsecase: sl()));
   sl.registerLazySingleton(() => FilesWrapperViewModel());
   sl.registerLazySingleton(() => PreviousFilesViewModel(sl()));
   sl.registerLazySingleton(() => RequiredFilesViewModel(sl()));
-  sl.registerLazySingleton(() => PayIdInfoViewModel(sl()));
+  sl.registerLazySingleton(() => PayIdInfoViewModel(sl(), sl()));
   sl.registerLazySingleton(() => PaymentWrapperViewModel());
-  sl.registerLazySingleton(() => PaymentDetailsViewModel(getPaymentRateListUsecase: sl()));
-  sl.registerLazySingleton(() => ReceiverInfoViewModel(getCountriesUsecase: sl(), getBankListUsecase: sl(), receiverAddUsecase: sl()));
+  sl.registerLazySingleton(() => PaymentDetailsViewModel(
+      getPaymentRateListUsecase: sl(), getReceiverCurrenciesUsecase: sl()));
+  sl.registerLazySingleton(() => ReceiverInfoViewModel(
+        getUremitBanksCountriesUsecase: sl(),
+        getBankListUsecase: sl(),
+        receiverAddUsecase: sl(),
+        validateBankUsecase: sl(),
+        getAdministrativeChargesListUsecase: sl(),
+      ));
   sl.registerLazySingleton(() => PoliPaymentViewModel());
   sl.registerLazySingleton(() => CreditCardPaymentViewModel());
 
-  sl.registerLazySingleton(() => ReceiptScreenViewModel(getPaymentMethodsReponseUsecase: sl(), insertPaymentUsecase: sl()));
+  sl.registerLazySingleton(() => ReceiptScreenViewModel(
+      getPaymentMethodsReponseUsecase: sl(),
+      insertPaymentUsecase: sl(),
+      updatePaymentUsecase: sl(),
+      getTransactionByTxnUsecase: sl()));
 
-  sl.registerLazySingleton(() => ProfileInfoViewModel(docTypeUsecase: sl(), countriesProvinceUsecase: sl(), getCountriesUsecase: sl(), setProfileDetailsUsecase: sl()));
+  sl.registerLazySingleton(() => ProfileInfoViewModel(
+      docTypeUsecase: sl(),
+      countriesProvinceUsecase: sl(),
+      getCountriesUsecase: sl(),
+      setProfileDetailsUsecase: sl()));
 
   /// Navigator
   sl.registerLazySingleton(() => AppState());

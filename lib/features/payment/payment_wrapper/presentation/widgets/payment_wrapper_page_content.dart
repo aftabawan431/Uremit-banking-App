@@ -21,13 +21,12 @@ class PaymentWrapperPageContent extends StatefulWidget {
 }
 
 class _PaymentWrapperPageContentState extends State<PaymentWrapperPageContent> {
-  HomeViewModel homeViewModel=sl();
+  HomeViewModel homeViewModel = sl();
   @override
   void initState() {
     context.read<PaymentWrapperViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -44,29 +43,24 @@ class _PaymentWrapperPageContentState extends State<PaymentWrapperPageContent> {
             key: context.read<PaymentWrapperViewModel>().bottomNavigationKey,
             index: 0,
             isPaymentPage: false,
-
             height: 50.0,
-
-            pages:  [
+            pages: [
               const PaymentDetailsPage(),
               const ReceiverInfoPage(),
-              if(homeViewModel.profileHeader!.profileHeaderBody.first.fullName.isEmpty)
-              const ProfileInfoPage(),
+              if (homeViewModel.profileHeader!.profileHeaderBody.first.fullName.isEmpty) const ProfileInfoPage(),
             ],
-            titles:  [
+            titles: [
               'Payment Details',
               'Receiver Info ',
-              if(homeViewModel.profileHeader!.profileHeaderBody.first.fullName.isEmpty)
-              'Personal Info',
+              if (homeViewModel.profileHeader!.profileHeaderBody.first.fullName.isEmpty) 'Personal Info',
             ],
             color: Colors.white,
             buttonBackgroundColor: Theme.of(context).indicatorColor,
             backgroundColor: Colors.transparent,
             animationCurve: Curves.easeInOut,
             letIndexChange: (index) => true,
-            onTap: (int i){
+            onTap: (int i) {
               print(i);
-
             },
           )
         ],

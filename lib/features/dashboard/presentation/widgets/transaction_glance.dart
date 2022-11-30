@@ -31,39 +31,116 @@ class TransactionGlance extends StatelessWidget {
             ],
           ),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _item('Total', context.read<DashboardViewModel>().getTransactionLists!.getTransactionListResponseModelBody.transactionsStats.totalTransaction.toString(), context),
-            _divider(),
-            _item('Successful',context.read<DashboardViewModel>().getTransactionLists!.getTransactionListResponseModelBody.transactionsStats.successfullTransaction.toString(), context),
-            _divider(),
-            _item('Pending', context.read<DashboardViewModel>().getTransactionLists!.getTransactionListResponseModelBody.transactionsStats.pendingTransaction.toString(), context),
-          ],
-        ),
+        child: ValueListenableBuilder<String>(
+            valueListenable:
+                context.read<DashboardViewModel>().statusSearchNotifier,
+            builder: (context, value, __) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _item(
+                      'All',
+                      context
+                          .read<DashboardViewModel>()
+                          .getTransactionLists!
+                          .getTransactionListResponseModelBody
+                          .transactionsStats
+                          .totalTransaction
+                          .toString(),
+                      context, () {
+                    context.read<DashboardViewModel>().onStatusChange('all');
+                    context
+                        .read<DashboardViewModel>()
+                        .statusSearchNotifier
+                        .value = 'All';
+                  }
+                      ,selected: value=='All'
+                  ),
+                  _divider(),
+                  _item(
+                      'Successful',
+                      context
+                          .read<DashboardViewModel>()
+                          .getTransactionLists!
+                          .getTransactionListResponseModelBody
+                          .transactionsStats
+                          .successfullTransaction
+                          .toString(),
+                      context, () {
+                    context
+                        .read<DashboardViewModel>()
+                        .onStatusChange('Completed');
+                    context
+                        .read<DashboardViewModel>()
+                        .statusSearchNotifier
+                        .value = 'Successful';
+                  }
+                      ,selected: value=='Successful'
+                  ),
+                  _divider(),
+                  _item(
+
+                      'Pending',
+                      context
+                          .read<DashboardViewModel>()
+                          .getTransactionLists!
+                          .getTransactionListResponseModelBody
+                          .transactionsStats
+                          .pendingTransaction
+                          .toString(),
+                      context, () {
+                    context
+                        .read<DashboardViewModel>()
+                        .onStatusChange('Requested');
+                    context
+                        .read<DashboardViewModel>()
+                        .statusSearchNotifier
+                        .value = 'Pending';
+                  },selected: value=='Pending'
+
+
+                  ),
+                ],
+              );
+            }),
       ),
     );
   }
 
   Widget _divider() {
-    return VerticalDivider(color: Colors.grey, thickness: 1.5, indent: 16.h, endIndent: 16.h);
+    return VerticalDivider(
+        color: Colors.grey, thickness: 1.5, indent: 16.h, endIndent: 16.h);
   }
 
-  Widget _item(String title, String count, BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.subtitle2,
+  Widget _item(
+      String title, String count, BuildContext context, Function() onTap,
+      {bool selected = false}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 13.w,vertical: 5.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle2!
+                  .copyWith(fontSize:selected?17.sp: 13.sp),
+            ),
+            SizedBox(height: 5.h),
+            Text(
+              count,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle2
+                  ?.copyWith(color: Colors.white,fontSize: selected?17.sp:13.sp),
+            ),
+          ],
         ),
-        SizedBox(height: 5.h),
-        Text(
-          count,
-          style: Theme.of(context).textTheme.subtitle2?.copyWith(color: Colors.white),
-        ),
-      ],
+      ),
     );
   }
 }

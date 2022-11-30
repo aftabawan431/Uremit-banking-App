@@ -106,13 +106,13 @@ class PersonalPagination extends StatelessWidget {
                   _detailItem(
                       context: context,
                       icon: AppAssets.icPostalCodeSvg,
-                      title: 'Postal Code',
+                      title: 'Post Code',
                       detail: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.postalCode),
                   const Divider(),
-                  _detailItem(context: context, icon: AppAssets.icCitySvg, title: 'City', detail: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.city),
+                  _detailItem(context: context, icon: AppAssets.icCitySvg, title: 'Suburb', detail: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.city),
                   const Divider(),
                   _detailItem(
-                      context: context, icon: AppAssets.icProvinceSvg, title: 'Province', detail: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.province),
+                      context: context, icon: AppAssets.icProvinceSvg, title: 'State', detail: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.province),
                 ],
               ),
             ),

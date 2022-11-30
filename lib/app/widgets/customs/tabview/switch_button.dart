@@ -28,14 +28,14 @@ class SwitchButton extends StatelessWidget {
           borderRadius: 30.0,
           showOnOff: false,
           onToggle: (val) {
-  if(context.read<ReceiverInfoViewModel>().validateReceiverInfo()){
-    if(val==true){
-      context.read<ReceiverInfoViewModel>().pageController.animateToPage(1, duration: Duration(milliseconds: 400), curve: Curves.ease);
-
-    }
-    context.read<ReceiverInfoViewModel>().status.value = val;
-  }
-
+            if (context.read<ReceiverInfoViewModel>().validateReceiverInfo()) {
+              if (val == true) {
+                context.read<ReceiverInfoViewModel>().pageController.animateToPage(1, duration: Duration(milliseconds: 400), curve: Curves.ease);
+              }
+              context.read<ReceiverInfoViewModel>().status.value = val;
+            } else {
+              context.read<ReceiverInfoViewModel>().status.value = false;
+            }
           },
         );
       },

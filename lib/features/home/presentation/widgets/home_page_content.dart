@@ -8,7 +8,8 @@ import 'package:uremit/app/widgets/bottom_sheets/menu_bottom_sheet.dart';
 import 'package:uremit/app/widgets/customs/bottom_nav_bar_icons_icons.dart';
 import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
-import 'package:uremit/utils/router/uremit_router_delegate.dart';
+
+import '../../../../utils/router/uremit_router_delegate.dart';
 
 PersistentBottomSheetController? globalBottomSheetController;
 
@@ -56,8 +57,9 @@ class _HomePageContentState extends State<HomePageContent> {
           valueListenable: context.read<HomeViewModel>().fabClicked,
           builder: (_, value, __) {
             return FloatingActionButton(
+              backgroundColor: Theme.of(context).indicatorColor,
               onPressed: context.read<HomeViewModel>().onFabTap,
-              child: Icon(BottomNavBarIcons.payment, color: value ? Theme.of(context).primaryColor : Colors.grey, size: 34.w),
+              child: Icon(BottomNavBarIcons.payment, color: value ? Theme.of(context).primaryColor : Colors.white, size: 34.w),
             );
           },
         ),
@@ -80,7 +82,6 @@ class _HomePageContentState extends State<HomePageContent> {
             activeColor: Theme.of(context).primaryColor,
             inactiveColor: Colors.grey,
             onTap: (index) {
-
               if (index == 3) {
                 MenuBottomSheet _bottomSheet = MenuBottomSheet(context);
                 globalHomeContext = context;

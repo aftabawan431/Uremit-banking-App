@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/bottom_sheets/delete_card_bottom_sheet.dart';
 import 'package:uremit/features/cards/presentation/manager/cards_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
-import 'package:uremit/utils/router/uremit_router_delegate.dart';
+
+import '../../../../utils/router/uremit_router_delegate.dart';
 
 class CardItem extends StatelessWidget {
   const CardItem({Key? key}) : super(key: key);

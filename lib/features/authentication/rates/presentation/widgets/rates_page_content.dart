@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:logger/logger.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/bottom_sheets/rate_list_bottom_sheet.dart';
 import 'package:uremit/features/authentication/rates/presentation/manager/rates_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
 
+import '../../../../../app/globals.dart';
 import '../../../../../app/widgets/customs/continue_button.dart';
 import '../../../../../app/widgets/customs/custom_form_field.dart';
 import '../../../../../utils/constants/app_level/app_assets.dart';
@@ -21,7 +25,14 @@ class RatesPageContent extends StatefulWidget {
 class _RatesPageContentState extends State<RatesPageContent> {
   @override
   void initState() {
-    context.read<RatesViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+    RatesViewModel viewModel=sl();
+    viewModel.onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+  
+
+    Timer(Duration(milliseconds: 400),(){
+      viewModel.resetFields();
+
+    });
     super.initState();
   }
 
@@ -32,7 +43,7 @@ class _RatesPageContentState extends State<RatesPageContent> {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 22.w),
           child: Form(
-            key: context.read<RatesViewModel>().formKey,
+            key: context.read<RatesViewModel>().ratesFormKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -121,11 +132,11 @@ class _RatesPageContentState extends State<RatesPageContent> {
                   text: 'Send',
                   loadingNotifier: context.read<RatesViewModel>().isLoadingNotifier,
                   isEnabledNotifier: context.read<RatesViewModel>().sendEnabledNotifier,
-                  onPressed:(){
-                    if(context.read<RatesViewModel>().formKey.currentState!.validate()){
+                  onPressed: () {
+                    if (context.read<RatesViewModel>().ratesFormKey.currentState!.validate()) {
                       context.read<RatesViewModel>().send();
                     }
-                  } ,
+                  },
                 ),
               ],
             ),

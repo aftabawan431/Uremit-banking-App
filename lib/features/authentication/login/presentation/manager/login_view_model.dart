@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:uremit/app/my_app.dart';
 import 'package:uremit/app/providers/account_provider.dart';
 import 'package:uremit/features/authentication/auth_wrapper/presentation/manager/auth_wrapper_view_model.dart';
@@ -19,6 +20,7 @@ import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
 import 'package:uremit/features/menu/profile/presentation/manager/profile_view_model.dart';
 import 'package:uremit/features/menu/update_profile/presentation/manager/update_profile_view_model.dart';
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
+import 'package:uremit/services/date_services.dart';
 import 'package:uremit/utils/constants/enums/page_state_enum.dart';
 import 'package:uremit/utils/router/models/page_action.dart';
 import 'package:uremit/utils/router/models/page_config.dart';
@@ -55,13 +57,16 @@ class LoginViewModel extends ChangeNotifier {
 
   final String emailLabelText = 'Email';
   final String emailHintText = 'Enter Email Address';
-  final TextEditingController emailController = TextEditingController(text: 'test@gmail.com');
+  final TextEditingController emailController = TextEditingController();
+  // final TextEditingController emailController = TextEditingController(text: 'aftabawan431@gmail.com');
   final FocusNode emailFocusNode = FocusNode();
 
   final String passwordLabelText = 'Password';
   final String passwordHintText = 'Enter Password';
-  final TextEditingController passwordController = TextEditingController(text: 'Login@786');
+  final TextEditingController passwordController = TextEditingController();
+  // final TextEditingController passwordController = TextEditingController(text: 'Login@786');
   final FocusNode passwordFocusNode = FocusNode();
+
 
   // Getters
   AppState appState = GetIt.I.get<AppState>();
@@ -78,6 +83,7 @@ class LoginViewModel extends ChangeNotifier {
   // Usecase Calls
   Future<void> login() async {
     isLoadingNotifier.value = true;
+
     _authWrapperViewModel.currentIndex = 0;
     var params = LoginRequestModel(
       clientId: 1,
@@ -88,7 +94,7 @@ class LoginViewModel extends ChangeNotifier {
       deviceName: _accountProvider.deviceName,
       androidVersion: _accountProvider.androidVersion,
       appVersion: _accountProvider.appVersion,
-      dateTime: DateTime.now().toIso8601String(),
+      dateTime: DateService().format(DateTime.now()),
       rememberMe: false,
     );
 
@@ -102,27 +108,41 @@ class LoginViewModel extends ChangeNotifier {
       loginEither.foldRight(null, (response, previous) {
         _accountProvider.userDetails = response;
         isLoadingNotifier.value = false;
+        onErrorMessage?.call(OnErrorMessageModel(
+            message: 'Login Successfully', backgroundColor: Colors.green));
+
         if (response.userDetails.isVerified) {
-          sessionTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+          sessionTimer =
+              Timer.periodic(const Duration(seconds: 1), (timer) async {
             // Logger().v(sessionSeconds);
 
             sessionSeconds--;
             if (sessionSeconds == 0) {
               sessionTimer!.cancel();
+
               // onErrorMessage?.call(OnErrorMessageModel(message: 'session expired login again', backgroundColor: Colors.grey));
               isSessionExpired = true;
               await logOut();
-              appState.currentAction = PageAction(state: PageState.replaceAll, page: PageConfigs.authWrapperPageConfig);
+              appState.currentAction = PageAction(
+                  state: PageState.replaceAll,
+                  page: PageConfigs.authWrapperPageConfig);
 
               // move user to login
 
             }
           });
-          clearFields();
+          // clearFields();
+          previousFilesViewModel.clearFiles();
+          requiredFilesViewModel.clearFiles();
+          homeViewModel.clearData();
+          profileViewModel.clearData();
+          updateProfileViewModel.clearFields();
+          paymentDetailsViewModel.clearAllTextFields();
 
           moveToHomePage();
         } else {
-          onErrorMessage?.call(OnErrorMessageModel(message: 'Account not verified'));
+          onErrorMessage
+              ?.call(OnErrorMessageModel(message: 'Account not verified'));
           moveToOtpPage();
           _otpViewModel.generateOtp();
         }
@@ -132,7 +152,8 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> logOut() async {
     isLogOutLoadingNotifier.value = true;
-    var logoutEither = await logoutUsecase.call(LogoutRequestModel(userId: _accountProvider.userDetails!.userDetails.id));
+    var logoutEither = await logoutUsecase.call(LogoutRequestModel(
+        userId: _accountProvider.userDetails!.userDetails.id));
     if (logoutEither.isLeft()) {
       handleError(logoutEither);
       isLogOutLoadingNotifier.value = true;
@@ -149,8 +170,6 @@ class LoginViewModel extends ChangeNotifier {
         updateProfileViewModel.clearFields();
         paymentDetailsViewModel.clearAllTextFields();
 
-        // TODO: clear receivers list
-        // TODO: clear cards list
         logoutResponseModel = response;
       });
       isLogOutLoadingNotifier.value = false;
@@ -217,19 +236,24 @@ class LoginViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
   // Page Moves
   void moveToGetEmailPage() {
-    appState.currentAction = PageAction(state: PageState.addPage, page: PageConfigs.getEmailPageConfig);
+    appState.currentAction = PageAction(
+        state: PageState.addPage, page: PageConfigs.getEmailPageConfig);
   }
 
   void moveToHomePage() {
-    appState.currentAction = PageAction(state: PageState.replaceAll, page: PageConfigs.homePageConfig);
+    appState.currentAction = PageAction(
+        state: PageState.replaceAll, page: PageConfigs.homePageConfig);
   }
 
   void moveToOtpPage() {
-    appState.currentAction = PageAction(state: PageState.addPage, page: PageConfigs.otpPageConfig);
+    appState.currentAction =
+        PageAction(state: PageState.addPage, page: PageConfigs.otpPageConfig);
   }
 }

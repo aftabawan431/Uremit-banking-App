@@ -13,7 +13,7 @@ import '../../../../../app/widgets/customs/continue_button.dart';
 import '../../../../../app/widgets/customs/custom_form_field.dart';
 import '../../../../../utils/constants/app_level/app_assets.dart';
 import '../../../../../utils/constants/enums/attachment_type.dart';
-import '../../../../../utils/globals/app_globals.dart';
+import '../../../../files/required_files/presentation/manager/required_file_view_model.dart';
 
 class DocumentsPageContent extends StatefulWidget {
   const DocumentsPageContent({Key? key}) : super(key: key);
@@ -97,7 +97,7 @@ class _DocumentsPageContentState extends State<DocumentsPageContent> {
                 SizedBox(height: 16.h),
                 CustomTextFormField(
                   maxLines: 1,
-                  readOnly: false,
+                  readOnly: true,
                   suffixIconPath: AppAssets.icCameraSvg,
                   prefixIconPath: AppAssets.icDocumentTypeSvg,
                   keyboardType: TextInputType.name,
@@ -172,17 +172,22 @@ class _DocumentsPageContentState extends State<DocumentsPageContent> {
                   text: 'Save',
                   loadingNotifier: context.read<DocumentsViewModel>().isDocsLoadingNotifier,
                   onPressed: () async {
-                    context.read<DocumentsViewModel>().isSaveButtonPressed = true;
-                    if (!context.read<DocumentsViewModel>().documentFormKey.currentState!.validate() &&
-                        requiredDocId.isEmpty &&
-                        requiredDocId == null &&
-                        requiredDocAttachmentId == null &&
-                        requiredDocAttachmentId.isEmpty) {
+                    context.read<DocumentsViewModel>().isDocumentPageButtonPressed = true;
+                    print('this is the  response ${!context.read<DocumentsViewModel>().documentFormKey.currentState!.validate()}');
+
+                    if (!context.read<DocumentsViewModel>().documentFormKey.currentState!.validate()
+                        // &&
+                        // requiredDocId.isEmpty &&
+                        // requiredDocId == null &&
+                        // requiredDocAttachmentId == null &&
+                        // requiredDocAttachmentId.isEmpty
+                        ) {
+                      print('hhhh');
                       return;
                     }
                     await context.read<DocumentsViewModel>().documentRequired(context);
-                    // context.read<DocumentsViewModel>().clearFields();
-                    // context.read<RequiredFilesViewModel>().isLoadingNotifier.value = true;
+
+                    context.read<RequiredFilesViewModel>().isLoadingNotifier.value = true;
                   },
                 ),
                 SizedBox(height: 16.h),

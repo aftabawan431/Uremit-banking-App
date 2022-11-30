@@ -69,6 +69,5 @@ class AppAssets {
   static const successDialogBackgroundPng = 'assets/images/success_dialog_background.png';
   static const carouselPlaceholderPng = 'assets/images/carousel_placeholder.jpg';
   static const transactionPlaceholderPng = 'assets/images/transaction_placeholder.png';
-  static const defaultPicture =
-      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80';
+  static const defaultPicture = 'assets/images/profile_avatar.png';
 }

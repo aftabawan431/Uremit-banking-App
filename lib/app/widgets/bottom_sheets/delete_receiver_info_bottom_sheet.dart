@@ -7,6 +7,7 @@ import 'package:uremit/features/receivers/presentation/manager/receiver_view_mod
 
 import '../../../utils/router/uremit_router_delegate.dart';
 
+
 class DeleteReceiverInfoBottomSheet {
   final BuildContext context;
   final bool isDeleteReceiver;

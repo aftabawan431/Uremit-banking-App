@@ -16,7 +16,6 @@ class AccountWrapperViewModel extends ChangeNotifier {
 
   // Properties
   final GlobalKey<CustomTabViewState> bottomNavigationKey = GlobalKey();
-  int currentIndex = 0;
 
   // Getters
   AppState appState = GetIt.I.get<AppState>();

@@ -20,7 +20,8 @@ class ProfileInfoPageContent extends StatefulWidget {
 class _ProfileInfoPageContentState extends State<ProfileInfoPageContent> {
   @override
   void initState() {
-    context.read<ProfileInfoViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+    context.read<ProfileInfoViewModel>().onErrorMessage = (value) => context
+        .show(message: value.message, backgroundColor: value.backgroundColor);
     super.initState();
   }
 
@@ -28,13 +29,17 @@ class _ProfileInfoPageContentState extends State<ProfileInfoPageContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ValueListenableBuilder<bool>(
-          valueListenable: context.read<ProfileInfoViewModel>().profileInfoViewModel.isLoadingNotifier,
+          valueListenable: context
+              .read<ProfileInfoViewModel>()
+              .profileInfoViewModel
+              .isLoadingNotifier,
           builder: (_, value, __) {
             if (value) {
               return Center(
                 child: CircularProgressIndicator.adaptive(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor),
                 ),
               );
             }
@@ -47,12 +52,14 @@ class _ProfileInfoPageContentState extends State<ProfileInfoPageContent> {
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: ExpandablePageView(
-                      controller: context.read<ProfileInfoViewModel>().pageController,
+                      controller:
+                          context.read<ProfileInfoViewModel>().pageController,
                       physics: const BouncingScrollPhysics(),
                       animationDuration: const Duration(milliseconds: 500),
                       animateFirstPage: true,
                       scrollDirection: Axis.horizontal,
-                      onPageChanged: context.read<ProfileInfoViewModel>().onPageChange,
+                      onPageChanged:
+                          context.read<ProfileInfoViewModel>().onPageChange,
                       children: const [
                         PersonalInfoDetails(),
                         PersonalAddressDetails(),
@@ -64,7 +71,8 @@ class _ProfileInfoPageContentState extends State<ProfileInfoPageContent> {
                 SizedBox(
                   height: 40.h,
                   child: SmoothPageIndicator(
-                    controller: context.read<ProfileInfoViewModel>().pageController,
+                    controller:
+                        context.read<ProfileInfoViewModel>().pageController,
                     count: 3,
                     effect: ScrollingDotsEffect(
                       dotHeight: 10,

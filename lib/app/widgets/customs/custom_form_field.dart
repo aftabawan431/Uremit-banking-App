@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  const CustomTextFormField({
+   CustomTextFormField({
     required this.hintText,
     required this.labelText,
     this.obscureText = false,
@@ -29,10 +29,16 @@ class CustomTextFormField extends StatelessWidget {
     this.networkPrefix = false,
     this.interactiveSelection = true,
     this.maxLength,
+    this.regexExp,
     this.maxLengthEnforced,
+    this.autoFocus=false,
+     this.prefixIconOnTap,
+     this.customPrefix,
+     this.showLimitText=false,
     Key? key,
   }) : super(key: key);
 
+   final bool showLimitText;
   final String hintText;
   final String labelText;
   final bool obscureText;
@@ -51,17 +57,21 @@ class CustomTextFormField extends StatelessWidget {
   final EdgeInsets? contentPadding;
   final String? prefixIconPath;
   final String? suffixIconPath;
+  final List<TextInputFormatter>? regexExp;
   final Function()? suffixIconOnTap;
+  final Function()? prefixIconOnTap;
   final Function()? onTap;
   final Widget? prefix;
   final Widget? suffix;
   final bool networkPrefix;
   final bool interactiveSelection;
-
+  bool autoFocus;
+  Widget? customPrefix;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofocus: autoFocus,
       enableInteractiveSelection: interactiveSelection,
       readOnly: readOnly,
       enabled: enabled,
@@ -69,23 +79,24 @@ class CustomTextFormField extends StatelessWidget {
       obscuringCharacter: '●',
       controller: controller,
       keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
+      inputFormatters: regexExp,
       focusNode: focusNode,
       onFieldSubmitted: onFieldSubmitted,
+
       onChanged: onChanged,
       cursorHeight: 20,
       maxLines: maxLines,
       maxLength: maxLength,
-      maxLengthEnforcement:maxLengthEnforced==true? MaxLengthEnforcement.enforced:MaxLengthEnforcement.none,
+
+      maxLengthEnforcement: maxLengthEnforced == true ? MaxLengthEnforcement.enforced : MaxLengthEnforcement.none,
       onTap: onTap,
       style: GoogleFonts.openSans(
         color: const Color(0xFF000812),
         fontWeight: FontWeight.w500,
         letterSpacing: 0.25,
       ),
-
       decoration: InputDecoration(
-
+        counterText:showLimitText?null: "",
         hintText: hintText,
         labelText: labelText,
         contentPadding: contentPadding,
@@ -101,28 +112,34 @@ class CustomTextFormField extends StatelessWidget {
                   ),
                 ),
               ),
-        prefixIcon: prefixIconPath == null
+        prefixIcon:customPrefix!=null?Padding(
+          padding:  EdgeInsets.symmetric(horizontal: 16.w),
+          child: customPrefix,
+        ): prefixIconPath == null
             ? null
-            : Transform.translate(
-                offset: Offset(0, -1.h),
-                child: Padding(
-                  padding: EdgeInsets.only(left: 16.w, right: 10.w),
-                  child: networkPrefix
-                      ? ClipOval(
-                          child: SizedBox(
-                            width: 25.w,
-                            height: 25.w,
-                            child: SvgPicture.network(
-                              prefixIconPath!,
+            : GestureDetector(
+          onTap: prefixIconOnTap,
+              child: Transform.translate(
+                  offset: Offset(0, -1.h),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 16.w, right: 10.w),
+                    child: networkPrefix
+                        ? ClipOval(
+                            child: SizedBox(
                               width: 25.w,
                               height: 25.w,
-                              fit: BoxFit.cover,
+                              child: SvgPicture.network(
+                                prefixIconPath!,
+                                width: 25.w,
+                                height: 25.w,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                        )
-                      : SvgPicture.asset(prefixIconPath!),
+                          )
+                        : SvgPicture.asset(prefixIconPath!),
+                  ),
                 ),
-              ),
+            ),
         prefixIconConstraints: BoxConstraints(minWidth: 24.w, minHeight: 24.w),
         suffixIconConstraints: BoxConstraints(minWidth: 24.w, minHeight: 24.w),
         suffix: suffix,

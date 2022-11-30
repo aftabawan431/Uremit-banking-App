@@ -5,6 +5,7 @@ import 'package:uremit/features/payment/payment_details/presentation/manager/pay
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
 
 import '../../../../../app/globals.dart';
+import '../../../receiver_info/presentation/manager/receiver_info_view_model.dart';
 import '../manager/receipt_screen_view_model.dart';
 import '../widgets/receipt_screen_page_content.dart';
 
@@ -20,6 +21,8 @@ class _ReceiptScreenPageState extends State<ReceiptScreenPage> {
   final PaymentDetailsViewModel _paymentDetailsViewModel = sl();
   final ReceiverViewModel _receiverViewModal = sl();
   final CardsViewModel _cardsViewModel = sl();
+  ReceiverInfoViewModel _receiverInfoViewModel=sl();
+
 
 
   @override
@@ -36,6 +39,7 @@ class _ReceiptScreenPageState extends State<ReceiptScreenPage> {
                 ChangeNotifierProvider.value(value: _paymentDetailsViewModel),
                 ChangeNotifierProvider.value(value: _receiverViewModal),
                 ChangeNotifierProvider.value(value: _cardsViewModel),
+                ChangeNotifierProvider.value(value: _receiverInfoViewModel),
               ],
               child: const ReceiptScreenPageContent())
         ),

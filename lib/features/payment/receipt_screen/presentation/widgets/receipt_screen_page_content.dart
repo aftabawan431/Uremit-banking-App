@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/customs/custom_app_bar.dart';
-import 'package:uremit/features/payment/receipt_screen/modal/getPaymentMethodResponseModal.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_Payment_Method_Response_Model.dart';
 import 'package:uremit/features/payment/receipt_screen/presentation/widgets/payment_method_widget.dart';
 import 'package:uremit/features/payment/receipt_screen/presentation/widgets/receipt_details.dart';
 import 'package:uremit/features/payment/receipt_screen/presentation/widgets/select_card_widget.dart';
@@ -16,12 +16,9 @@ import 'package:uremit/utils/router/app_state.dart';
 import 'package:uremit/utils/router/models/page_action.dart';
 
 import '../../../../../app/globals.dart';
-import '../../../../../app/providers/account_provider.dart';
-import '../../../../../app/widgets/bottom_sheets/bank_transfer_payment_status_bottom_sheet.dart';
 import '../../../../../app/widgets/clippers/receipt_details_clipper.dart';
 import '../../../../../utils/router/models/page_config.dart';
 import '../../../../cards/presentation/manager/cards_view_model.dart';
-import '../../../../home/presentation/manager/home_view_model.dart';
 import '../../../../receivers/presentation/manager/receiver_view_model.dart';
 import '../../../payment_details/presentation/manager/payment_details_view_model.dart';
 import '../manager/receipt_screen_view_model.dart';
@@ -35,8 +32,12 @@ class ReceiptScreenPageContent extends StatefulWidget {
 }
 
 class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
+  late bool fromUpdateGateway;
+
   @override
   void initState() {
+    fromUpdateGateway =
+        context.read<ReceiptScreenViewModel>().fromChangePaymentMethod;
     context.read<ReceiptScreenViewModel>().onErrorMessage = (value) => context
         .show(message: value.message, backgroundColor: value.backgroundColor);
     context.read<ReceiptScreenViewModel>().getPaymentMethods();
@@ -74,7 +75,9 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                 builder: (_, loading, __) {
                   if (loading) {
                     return const Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator.adaptive(
+                        strokeWidth: 2,
+                      ),
                     );
                   }
 
@@ -87,7 +90,6 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                           options: CarouselOptions(
                               height: 100.h,
                               onPageChanged: (int index, value) {
-
                                 context
                                         .read<ReceiptScreenViewModel>()
                                         .selectedPaymentMethod
@@ -96,10 +98,6 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                                         .read<ReceiptScreenViewModel>()
                                         .getPaymentMethodsBodyList
                                         .value[index];
-                                Logger().i(context
-                                    .read<ReceiptScreenViewModel>()
-                                    .getPaymentMethodsBodyList
-                                    .value[index].id);
 
                               }),
                           items: value.map((PaymentMethodBody item) {
@@ -127,8 +125,7 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           child: (selectedPaymentMethod != null &&
-                                  (selectedPaymentMethod.id == 6 ||
-                                      selectedPaymentMethod.id == 5))
+                                  (selectedPaymentMethod.id == 11))
                               ? ValueListenableBuilder<bool>(
                                   valueListenable: context
                                       .read<CardsViewModel>()
@@ -139,8 +136,10 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                                           const Duration(milliseconds: 500),
                                       child: cardsLoading
                                           ? const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+
+                                              child: CircularProgressIndicator.adaptive(
+                                                strokeWidth: 2,
+                                              ),
                                             )
                                           : const SelectCardWidget(),
                                     );
@@ -184,7 +183,7 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(height: 10.h),
-                                    const ReceiptDetails(),
+                                     ReceiptDetails(),
                                     // const UpdatePendingTransaction(),
                                   ],
                                 ),
@@ -217,7 +216,7 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 10.h),
-                            const ReceiptDetails(),
+                             ReceiptDetails(),
                             // const UpdatePendingTransaction(),
                           ],
                         ),
@@ -231,62 +230,64 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
             Align(
               alignment: Alignment.center,
               child: ValueListenableBuilder<bool>(
-                valueListenable: context.read<ReceiptScreenViewModel>().insertPaymentLoading,
-                builder: (_,value,__) {
-                  if(value){
-                    return Center(child: CircularProgressIndicator(),);
-                  }else{
-
-
-
-                  return GestureDetector(
-                    onTap: () {
-                      if (!validate()) {
-                        return;
-                      }
-
-                      handleNext();
-                      return;
-                      // if(context.read<ReceiptScreenViewModel>().selectedPaymentMethod=="Bank")
-
-                      AppState appState = sl();
-                      appState.currentAction = PageAction(
-                          state: PageState.addPage,
-                          page: PageConfigs.payIdInfoPageConfig);
-                    },
-                    child: Container(
-                      height: 40.h,
-                      width: 140.w,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Next',
-                          style: Theme.of(context).textTheme.bodyText2,
+                  valueListenable: context
+                      .read<ReceiptScreenViewModel>()
+                      .insertPaymentLoading,
+                  builder: (_, value, __) {
+                    if (value) {
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(
+                          // strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
-                      ),
-                    ),
-                  );
-                  }
-                }
-              ),
+                      );
+                    } else {
+                      return GestureDetector(
+                        onTap: () {
+                          if (!validate()) {
+                            return;
+                          }
+                          handleNext();
+                          return;
+                          // if(context.read<ReceiptScreenViewModel>().selectedPaymentMethod=="Bank")
+
+                          AppState appState = sl();
+                          appState.currentAction = PageAction(
+                              state: PageState.addPage,
+                              page: PageConfigs.payIdInfoPageConfig);
+                        },
+                        child: Container(
+                          height: 40.h,
+                          width: 140.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Next',
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  }),
             ),
             SizedBox(height: 15.h),
-            GestureDetector(
-              child: Center(
-                child: Text(
-                  'Looking for different way to pay?',
-                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                        color: Colors.blue,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                ),
-              ),
-            ),
+            // GestureDetector(
+            //   child: Center(
+            //     child: Text(
+            //       'Looking for different way to pay?',
+            //       style: Theme.of(context).textTheme.bodyText2?.copyWith(
+            //             color: Colors.blue,
+            //             fontSize: 12.sp,
+            //             fontWeight: FontWeight.bold,
+            //             decoration: TextDecoration.underline,
+            //           ),
+            //     ),
+            //   ),
+            // ),
             SizedBox(height: 15.h),
           ],
         ),
@@ -298,9 +299,6 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
     PaymentDetailsViewModel paymentDetailsViewModel =
         GetIt.I.get<PaymentDetailsViewModel>();
     ReceiverViewModel receiverViewModel = GetIt.I.get<ReceiverViewModel>();
-    HomeViewModel homeViewModel = GetIt.I.get<HomeViewModel>();
-    AccountProvider accountProvider = GetIt.I.get<AccountProvider>();
-    CardsViewModel cardsViewModel = GetIt.I.get<CardsViewModel>();
     ReceiptScreenViewModel receiptScreenViewModel =
         GetIt.I.get<ReceiptScreenViewModel>();
 
@@ -318,7 +316,7 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
     return true;
   }
 
-  handleNext() async{
+  handleNext() async {
     var selectedMethod =
         context.read<ReceiptScreenViewModel>().selectedPaymentMethod.value;
     if (selectedMethod == null) {
@@ -327,7 +325,14 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
     }
     PaymentDetailsViewModel paymentDetailsViewModel =
         GetIt.I.get<PaymentDetailsViewModel>();
-    if (paymentDetailsViewModel.isAccountDeposit.value) {
+
+    if (paymentDetailsViewModel.isAccountDeposit.value ||
+        (context.read<ReceiptScreenViewModel>().fromChangePaymentMethod &&
+            context
+                    .read<ReceiptScreenViewModel>()
+                    .updateTransaction!
+                    .payoutMethod ==
+                'Account Deposit')) {
       if (context.read<ReceiverViewModel>().selectedReceiverBank.value ==
           null) {
         context.show(message: 'No bank found');
@@ -335,22 +340,19 @@ class _ReceiptScreenPageContentState extends State<ReceiptScreenPageContent> {
       }
     }
 
-
-
-    if (selectedMethod.id.toString() == '5' ||
-        selectedMethod.id.toString() == '6') {
+    // Credit debit card idz
+    if (selectedMethod.id.toString() == '11') {
       // go to payment365
-      context.read<ReceiptScreenViewModel>().insertPayment();
+      context.read<ReceiptScreenViewModel>().insertPayment(context);
     } else if (selectedMethod.id.toString() == '8') {
-      context.read<ReceiptScreenViewModel>().insertPayment();
+      context.read<ReceiptScreenViewModel>().insertPayment(context);
       // go to payid screen
       // goToPayId();
     } else if (selectedMethod.id == 7) {
-
       //poly
-      context.read<ReceiptScreenViewModel>().insertPayment();
+      context.read<ReceiptScreenViewModel>().insertPayment(context);
     } else if (selectedMethod.id.toString() == '9') {
-         context.read<ReceiptScreenViewModel>().insertPayment();
+      context.read<ReceiptScreenViewModel>().insertPayment(context);
       // BankTransferPaymentStatusBottomSheet bottomSheet =
       //     BankTransferPaymentStatusBottomSheet(
       //         context: context, isDeleteReceiver: false);

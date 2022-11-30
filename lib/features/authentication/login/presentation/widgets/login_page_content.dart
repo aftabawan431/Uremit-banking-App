@@ -4,14 +4,21 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/customs/continue_button.dart';
 import 'package:uremit/app/widgets/customs/custom_form_field.dart';
 import 'package:uremit/features/authentication/login/presentation/manager/login_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
 
+import '../../../../../app/globals.dart';
 import '../../../../../app/my_app.dart';
 import '../../../../../utils/constants/app_level/app_assets.dart';
+import '../../../../../utils/constants/enums/page_state_enum.dart';
+import '../../../../../utils/router/app_state.dart';
+import '../../../../../utils/router/models/page_action.dart';
+import '../../../../../utils/router/models/page_config.dart';
 
 class LoginPageContent extends StatefulWidget {
   const LoginPageContent({Key? key}) : super(key: key);
@@ -25,12 +32,14 @@ class _LoginPageContentState extends State<LoginPageContent> {
   void initState() {
     context.read<LoginViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
     Timer(const Duration(milliseconds: 500), () {
-      checkIfCameFromSessionExpred();
+      checkIfCameFromSessionExpired();
     });
+    context.read<LoginViewModel>().clearFields();
+
     super.initState();
   }
 
-  checkIfCameFromSessionExpred() {
+  checkIfCameFromSessionExpired() {
     if (isSessionExpired) {
       isSessionExpired = false;
       showModal(
@@ -75,12 +84,13 @@ class _LoginPageContentState extends State<LoginPageContent> {
                   labelText: context.read<LoginViewModel>().emailLabelText,
                   hintText: context.read<LoginViewModel>().emailHintText,
                   controller: context.read<LoginViewModel>().emailController,
-                  focusNode: context.read<LoginViewModel>().emailFocusNode,
                   validator: context.read<LoginViewModel>().validateEmail,
+                  focusNode: context.read<LoginViewModel>().emailFocusNode,
                   onChanged: context.read<LoginViewModel>().onEmailChange,
                   onFieldSubmitted: (_) => context.read<LoginViewModel>().onEmailSubmitted(context),
                 ),
                 SizedBox(height: 22.h),
+
                 ValueListenableBuilder<bool>(
                   valueListenable: context.read<LoginViewModel>().obsecureTextNotifier,
                   builder: (_, obsecureText, __) {
@@ -94,8 +104,8 @@ class _LoginPageContentState extends State<LoginPageContent> {
                       hintText: context.read<LoginViewModel>().passwordHintText,
                       controller: context.read<LoginViewModel>().passwordController,
                       focusNode: context.read<LoginViewModel>().passwordFocusNode,
-                      onFieldSubmitted: (_) => context.read<LoginViewModel>().onPasswordSubmitted(context),
                       suffixIconOnTap: context.read<LoginViewModel>().onObsecureChange,
+                      onFieldSubmitted: (_) => context.read<LoginViewModel>().onPasswordSubmitted(context),
                       validator: context.read<LoginViewModel>().validatePassword,
                       onChanged: context.read<LoginViewModel>().onPasswordChange,
                     );
@@ -114,6 +124,7 @@ class _LoginPageContentState extends State<LoginPageContent> {
                   text: 'Login',
                   loadingNotifier: context.read<LoginViewModel>().isLoadingNotifier,
                   onPressed: () async {
+                    FocusScope.of(context).unfocus();
                     context.read<LoginViewModel>().isButtonPressed = true;
                     if (!context.read<LoginViewModel>().formKey.currentState!.validate()) {
                       return;
@@ -130,4 +141,6 @@ class _LoginPageContentState extends State<LoginPageContent> {
       ),
     );
   }
+
+
 }

@@ -10,11 +10,13 @@ import 'package:uremit/features/authentication/forgot_password/models/reset_pass
 import 'package:uremit/features/authentication/forgot_password/usecases/forgot_password_usecase.dart';
 import 'package:uremit/features/authentication/forgot_password/usecases/reset_password_usecase.dart';
 import 'package:uremit/features/authentication/forgot_password/usecases/validate_otp_usecase.dart';
+import 'package:uremit/features/authentication/otp/presentation/manager/otp_view_model.dart';
 import 'package:uremit/features/authentication/otp/usecases/generate_otp_usecase.dart';
 import 'package:uremit/services/models/on_error_message_model.dart';
 import 'package:uremit/utils/router/models/page_action.dart';
 import 'package:uremit/utils/router/models/page_config.dart';
 
+import '../../../../../app/globals.dart';
 import '../../../../../app/widgets/dialogs/success_dialog.dart';
 import '../../../../../services/error/failure.dart';
 import '../../../../../utils/constants/enums/page_state_enum.dart';
@@ -49,6 +51,12 @@ class ForgotPasswordViewModel extends ChangeNotifier {
   bool isNewPasswordError = false;
   bool isConfirmPasswordError = false;
 
+  bool otpTimer =true;
+  startTimer()async{
+    otpTimer =false;
+    notifyListeners();
+  }
+
   // Properties
   final GlobalKey<FormState> getEmailFormKey = GlobalKey<FormState>(debugLabel: 'GET-EMAIL-FORM-KEY');
   final GlobalKey<FormState> restForgotPasswordFormKey = GlobalKey<FormState>(debugLabel: 'RESET-FORGOT-PASSWORD-FORM-KEY');
@@ -58,6 +66,7 @@ class ForgotPasswordViewModel extends ChangeNotifier {
 
   final String emailLabelText = 'Email';
   final String emailHintText = 'Enter Email Address';
+  // final TextEditingController emailController = TextEditingController(text: 'aftabawan431@gmail.com');
   final TextEditingController emailController = TextEditingController();
   final FocusNode emailFocusNode = FocusNode();
 
@@ -94,20 +103,26 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       isForgotPasswordLoadingNotifier.value = false;
     }
   }
-
+  otpTimerChange(bool value){
+    otpTimer=value;
+    notifyListeners();
+  }
   Future<void> generateOtp() async {
     isGeneratePasswordLoadingNotifier.value = true;
+    otpTimerChange(true);
 
-    var params = GenerateOtpRequestModel(emailController.text);
+    var params = GenerateOtpRequestModel(emailController.text, 2);
 
     var generateOtpEither = await generateOtpUsecase.call(params);
 
     if (generateOtpEither.isLeft()) {
       handleError(generateOtpEither);
-      isGeneratePasswordLoadingNotifier.value = false;
+
+      notifyListeners();
     } else if (generateOtpEither.isRight()) {
       onErrorMessage?.call(OnErrorMessageModel(message: 'OTP sent!', backgroundColor: Colors.grey));
       isGeneratePasswordLoadingNotifier.value = false;
+
     }
   }
 
@@ -154,6 +169,14 @@ class ForgotPasswordViewModel extends ChangeNotifier {
         moveToAuthPages(context);
       });
     }
+  }
+
+  resetFields() {
+    newPasswordController.clear();
+    confirmPasswordController.clear();
+    isPasswordStrengthVisible.value = false;
+    passwordStrengthStr.value = '';
+    passwordStrengthColor.value = Colors.transparent;
   }
 
   // Methods

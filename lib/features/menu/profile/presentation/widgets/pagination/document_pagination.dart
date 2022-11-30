@@ -70,7 +70,8 @@ class DocumentPagination extends StatelessWidget {
                   _detailPictureItem(
                       context: context,
                       icon: AppAssets.icDocumentTypeSvg,
-                      title: 'Front Side: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.frontFileName}',
+                      // title: 'Front Side: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.frontFileName}',
+                      title: 'Front Side: Image',
                       imagePath: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.frontFilePath.isEmpty
                           ? AppAssets.carouselPlaceholderPng
                           : AppUrl.fileBaseUrl + context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.frontFilePath),
@@ -78,7 +79,8 @@ class DocumentPagination extends StatelessWidget {
                   _detailPictureItem(
                       context: context,
                       icon: AppAssets.icDocumentTypeSvg,
-                      title: 'Back Side: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.backFileName}',
+                      // title: 'Back Side: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.backFileName}',
+                      title: 'Back Side: Image',
                       imagePath: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.backFilePath.isEmpty
                           ? AppAssets.carouselPlaceholderPng
                           : AppUrl.fileBaseUrl + context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.backFilePath),
@@ -121,7 +123,8 @@ class DocumentPagination extends StatelessWidget {
                       onTap: () {},
                       context: context,
                       icon: AppAssets.icDocumentTypeSvg,
-                      title: 'Utility File: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.utilityBillFileName}',
+                      // title: 'Utility File: ${context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.utilityBillFileName}',
+                      title: 'Utility File: Image',
                       imagePath: context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.utilityBillPath.isEmpty
                           ? AppAssets.carouselPlaceholderPng
                           : AppUrl.fileBaseUrl + context.read<ProfileViewModel>().profileDetails!.ProfileDetailsBody.utilityBillPath),

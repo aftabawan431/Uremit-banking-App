@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_shadow/simple_shadow.dart';
 import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
@@ -29,31 +28,32 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
           radius: 55.r,
           backgroundColor: Colors.grey,
           child: ValueListenableBuilder<File?>(
-            valueListenable: context.read<HomeViewModel>().profileImgFile,
-            builder: (_,profileImg,__) {
-              return CircleAvatar(
-                radius: 53.r,
-                backgroundColor: Colors.white,
-                child: profileImg != null
-                    ? CircleAvatar(
-                        radius: 51.r,
-                        backgroundColor: Colors.grey.withOpacity(0.4),
-                        backgroundImage: FileImage(profileImg),
-                      )
-                    : context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage.isEmpty
-                        ? CircleAvatar(
-                            radius: 51.r,
-                            backgroundColor: Colors.grey.withOpacity(0.4),
-                            backgroundImage: const CachedNetworkImageProvider(AppAssets.defaultPicture),
-                          )
-                        : CircleAvatar(
-                            radius: 51.r,
-                            backgroundColor: Colors.grey.withOpacity(0.4),
-                            backgroundImage: CachedNetworkImageProvider(AppUrl.fileBaseUrl + context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage),
-                          ),
-              );
-            }
-          ),
+              valueListenable: context.read<HomeViewModel>().profileImgFile,
+              builder: (_, profileImg, __) {
+                return CircleAvatar(
+                  radius: 53.r,
+                  backgroundColor: Colors.white,
+                  child: profileImg != null
+                      ? CircleAvatar(
+                          radius: 51.r,
+                          backgroundColor: Colors.grey.withOpacity(0.4),
+                          backgroundImage: FileImage(profileImg),
+                        )
+                      : context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage.isEmpty
+                          ? CircleAvatar(
+                              radius: 35.r,
+                              backgroundColor: Colors.grey.withOpacity(0.4),
+                              backgroundImage: AssetImage(
+                                AppAssets.defaultPicture,
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 51.r,
+                              backgroundColor: Colors.grey.withOpacity(0.4),
+                              backgroundImage: CachedNetworkImageProvider(AppUrl.fileBaseUrl + context.read<HomeViewModel>().profileHeader!.profileHeaderBody.first.userImage),
+                            ),
+                );
+              }),
         ),
         Positioned(
           bottom: 16.h,

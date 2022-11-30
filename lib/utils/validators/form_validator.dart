@@ -1,3 +1,9 @@
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+import 'package:uremit/features/payment/payment_details/presentation/manager/payment_details_view_model.dart';
+
+import '../../app/globals.dart';
+
+
 class FormValidators {
   static String? validateEmail(String? value) {
     var emptyEmailError = 'Email address is empty';
@@ -6,7 +12,9 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyEmailError;
     } else {
-      final emailValidate = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
+      final emailValidate = RegExp(
+              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(value);
 
       if (!emailValidate) {
         return invalidEmailError;
@@ -23,9 +31,29 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyNameError;
     } else {
-      final nameValidate = RegExp(r"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$").hasMatch(value);
+      final nameValidate =
+          RegExp(r"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$")
+              .hasMatch(value);
       if (!nameValidate) {
         return invalidNameError;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  static String? validateFiled(String? value) {
+    var emptyFieldError = 'Field is empty';
+    var invalidFieldError = 'Field is not appropriate!';
+
+    if (value!.isEmpty) {
+      return emptyFieldError;
+    } else {
+      final fieldValidate =
+          RegExp(r"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$")
+              .hasMatch(value);
+      if (!fieldValidate) {
+        return invalidFieldError;
       } else {
         return null;
       }
@@ -39,7 +67,9 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyOccupationError;
     } else {
-      final nameValidate = RegExp(r"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$").hasMatch(value);
+      final nameValidate =
+          RegExp(r"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$")
+              .hasMatch(value);
       if (!nameValidate) {
         return invalidOccupationError;
       } else {
@@ -48,17 +78,18 @@ class FormValidators {
     }
   }
 
-  static String? validatePhone(String? value) {
+  static String? validatePhone(String? code, String? value) {
     var emptyPhoneError = 'Phone number is empty';
     var invalidPhoneError = 'Invalid phone number';
 
     if (value!.isEmpty) {
       return emptyPhoneError;
     } else {
-      String pattern = r'(^(?:[+0][1-9])?[0-9]{8,13}$)';
-      RegExp phoneValidate = RegExp(pattern);
+      final phone = PhoneNumber.parse(code! + value);
 
-      if (!phoneValidate.hasMatch(value)) {
+      final valid = phone.isValid(type: PhoneNumberType.mobile);
+
+      if (!valid) {
         return invalidPhoneError;
       } else {
         return null;
@@ -94,7 +125,7 @@ class FormValidators {
   }
 
   static String? validatePostalCode(String? value) {
-    var emptyPostalCodeError = 'Postal Code is empty';
+    var emptyPostalCodeError = 'Post Code is empty';
 
     if (value!.isEmpty) {
       return emptyPostalCodeError;
@@ -121,7 +152,7 @@ class FormValidators {
   }
 
   static String? validateDocumentRemarks(String? value) {
-    var emptyError = 'Document Number is empty';
+    var emptyError = 'Document Remarks is empty';
     var invalidRemarksError = 'not appropriate!';
     if (value!.isEmpty) {
       return emptyError;
@@ -196,7 +227,9 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyPasswordError;
     } else {
-      final passwordValidate = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$').hasMatch(value);
+      final passwordValidate = RegExp(
+              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$')
+          .hasMatch(value);
 
       if (!passwordValidate) {
         return invalidPasswordError;
@@ -263,7 +296,9 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyCityError;
     } else {
-      final cityValidate = RegExp(r'^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$').hasMatch(value);
+      final cityValidate =
+          RegExp(r'^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$').hasMatch(value);
+
 
       if (!cityValidate) {
         return invalidCityError;
@@ -280,7 +315,8 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyDescriptionError;
     } else {
-      final int descriptionValidate = RegExp(r'[\w-]+').allMatches(value).length;
+      final int descriptionValidate =
+          RegExp(r'[\w-]+').allMatches(value).length;
 
       if (descriptionValidate < 3) {
         return invalidDescriptionError;
@@ -297,7 +333,9 @@ class FormValidators {
     if (value!.isEmpty) {
       return emptyLinkError;
     } else {
-      final nameValidate = RegExp(r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)').hasMatch(value);
+      final nameValidate = RegExp(
+              r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)')
+          .hasMatch(value);
 
       if (!nameValidate) {
         return invalidLinkError;
@@ -312,6 +350,15 @@ class FormValidators {
 
     if (value!.isEmpty) {
       return emptyCountryError;
+    }
+    return null;
+  }
+
+  static String? validateCurrency(String? value) {
+    var emptyCurrencyError = 'Please select currency';
+
+    if (value!.isEmpty) {
+      return emptyCurrencyError;
     }
     return null;
   }
@@ -335,24 +382,39 @@ class FormValidators {
   }
 
   static String? validateSendMoney(String? value) {
-    var emptyMoneyError = 'Please Enter Money';
+    var emptyMoneyError = 'Please enter money';
+    var invalidPaymentError = 'First letter should not be zero';
 
     if (value!.isEmpty) {
       return emptyMoneyError;
+    }
+    if (value.startsWith('0')) {
+      print('hhhh');
+      return invalidPaymentError;
     }
     return null;
   }
 
   static String? validateReason(String? value) {
-    var emptyReasonError = 'Please Enter Reason';
-    var lessLengthError = 'Please Enter At least 20 letters long reason';
+    var emptyReasonError = 'Please enter reason';
+    var lessLengthError = 'Please enter at least 10 letters long reason';
 
     if (value!.isEmpty) {
       return emptyReasonError;
     }
-    if(value.length<20){
+    if (value.length < 10) {
       return lessLengthError;
     }
+
+
+   // else{
+   //    final moneyValidate =
+   //    RegExp(r'^([1-9]{0,1}[0-9]{0,100})$').hasMatch(value);
+   //    if(!moneyValidate){
+   //      return invalidPaymentError;
+   //    }
+
+    // }
     return null;
   }
 }

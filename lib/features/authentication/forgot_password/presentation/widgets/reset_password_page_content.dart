@@ -21,6 +21,7 @@ class _ResetPasswordPageContentState extends State<ResetPasswordPageContent> {
   @override
   void initState() {
     context.read<ForgotPasswordViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+    context.read<ForgotPasswordViewModel>().resetFields();
     super.initState();
   }
 
@@ -28,7 +29,7 @@ class _ResetPasswordPageContentState extends State<ResetPasswordPageContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const CustomAppBar(title: 'Forgot Password', showBackButton: false),
+      appBar: const CustomAppBar(title: 'Forgot Password',),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -121,6 +122,7 @@ class _ResetPasswordPageContentState extends State<ResetPasswordPageContent> {
                         text: 'Confirm',
                         loadingNotifier: context.read<ForgotPasswordViewModel>().isResetPasswordLoadingNotifier,
                         onPressed: () async {
+                          FocusScope.of(context).unfocus();
                           context.read<ForgotPasswordViewModel>().isConfirmButtonPressed = true;
                           if (!context.read<ForgotPasswordViewModel>().restForgotPasswordFormKey.currentState!.validate()) {
                             return;

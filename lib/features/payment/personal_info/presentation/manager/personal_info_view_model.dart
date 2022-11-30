@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:radio_group_v2/radio_group_v2.dart';
 import 'package:uremit/features/payment/personal_info/usecase/set_profile_details_usecase.dart';
 import 'package:uremit/services/models/no_params.dart';
@@ -28,6 +29,7 @@ import '../../../../menu/update_profile/models/get_countries_response_model.dart
 import '../../../../menu/update_profile/usecases/countries_province_usecase.dart';
 import '../../../../menu/update_profile/usecases/doc_type_usecase.dart';
 import '../../../../menu/update_profile/usecases/get_countries_usecase.dart';
+import '../../../payment_wrapper/presentation/manager/payment_wrapper_view_model.dart';
 import '../../models/set_profile_details_request_model.dart';
 
 class ProfileInfoViewModel extends ChangeNotifier {
@@ -41,11 +43,13 @@ class ProfileInfoViewModel extends ChangeNotifier {
   // Value Notifiers
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
-  ValueNotifier<bool> middleNameNotifier = ValueNotifier(true);
-
+  ValueNotifier<bool> middleNameNotifier = ValueNotifier(false);
+  ValueNotifier<bool> lastNameNotifier = ValueNotifier(false);
   ValueNotifier<bool> isCountryLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isProvinceLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isDocsLoadingNotifier = ValueNotifier(false);
+  ValueNotifier<String?> selectedPhoneNumber = ValueNotifier('+61');
+
 
   bool isFirstNameError = false;
   bool isMiddleNameError = false;
@@ -114,7 +118,7 @@ class ProfileInfoViewModel extends ChangeNotifier {
   final FocusNode nationalityFocusNode = FocusNode();
 
   final String phoneLabelText = 'Contact Number';
-  final String phoneHintText = '03xx-xxxxxxx';
+  final String phoneHintText = 'xxxx-xxxxxxx';
   final TextEditingController phoneController = TextEditingController();
   final FocusNode phoneFocusNode = FocusNode();
 
@@ -131,22 +135,22 @@ class ProfileInfoViewModel extends ChangeNotifier {
   final FocusNode dobFocusNode = FocusNode();
 
   final String addressLabelText = 'Address';
-  final String addressHintText = 'Enter Address';
+  final String addressHintText = 'Enter Street Number and Name';
   final TextEditingController addressController = TextEditingController();
   final FocusNode addressFocusNode = FocusNode();
 
-  final String postalLabelText = 'Postal Code';
-  final String postalHintText = 'Enter Postal Code';
+  final String postalLabelText = 'Post Code';
+  final String postalHintText = 'Enter Post Code';
   final TextEditingController postalController = TextEditingController();
   final FocusNode postalFocusNode = FocusNode();
 
-  final String cityLabelText = 'City';
-  final String cityHintText = 'Enter City';
+  final String cityLabelText = 'Suburb';
+  final String cityHintText = 'Enter Suburb';
   final TextEditingController cityController = TextEditingController();
   final FocusNode cityFocusNode = FocusNode();
 
   final String provinceLabelText = 'Province';
-  final String provinceHintText = 'Select Province';
+  final String provinceHintText = 'Select State';
   final TextEditingController provinceController = TextEditingController();
   String provinceId = '';
 
@@ -242,6 +246,7 @@ class ProfileInfoViewModel extends ChangeNotifier {
       return;
     }
 
+
     isProvinceLoadingNotifier.value = true;
 
     var provinceEither = await countriesProvinceUsecase.call(CountriesProvinceRequestModel(id));
@@ -251,7 +256,9 @@ class ProfileInfoViewModel extends ChangeNotifier {
       isProvinceLoadingNotifier.value = false;
     } else if (provinceEither.isRight()) {
       provinceEither.foldRight(null, (response, _) {
+        Logger().v(response.toJson());
         provincesList = response;
+
       });
       isProvinceLoadingNotifier.value = false;
     }
@@ -286,13 +293,13 @@ class ProfileInfoViewModel extends ChangeNotifier {
     var params = SetProfileDetailsRequestModel(
         userId: _accountProvider.userDetails!.userDetails.id.toString(),
         firstName: firstNameController.text,
-        middleName: middleNameController.text,
-        lastName: lastNameController.text,
+        middleName:!middleNameNotifier.value? middleNameController.text:'',
+        lastName:!lastNameNotifier.value? lastNameController.text:'',
         birthCountryId: cobId.toString(),
         occupation: occupationController.text,
         nationalityCountryId: nationalityId.toString(),
         genderId: genderRadioController.value == 'Female' ? 1 : 0,
-        phoneNumber: phoneController.text,
+        phoneNumber:  selectedPhoneNumber.value!+phoneController.text,
         dob: dobController.text,
         address: addressController.text,
         postalCode: postalController.text,
@@ -361,6 +368,7 @@ class ProfileInfoViewModel extends ChangeNotifier {
         updateEither.foldRight(null, (response, _) {
           onErrorMessage?.call(OnErrorMessageModel(message: 'Done', backgroundColor: Colors.green));
         });
+        goBackToReceiverInfo();
         saveNotifier.value = false;
       });
       saveNotifier.value = false;
@@ -374,6 +382,11 @@ class ProfileInfoViewModel extends ChangeNotifier {
     } else if (index > 1 && index <= 2) {
       validateSecondPage();
     }
+  }
+
+  goBackToReceiverInfo() {
+    PaymentWrapperViewModel provier = sl();
+    provier.buttonTap(1);
   }
 
   void validateFirstPage() {
@@ -392,6 +405,9 @@ class ProfileInfoViewModel extends ChangeNotifier {
 
   void onMiddleCheckboxClicked(bool? value) {
     middleNameNotifier.value = value ?? false;
+  }
+  void onLastCheckboxClicked(bool? value) {
+    lastNameNotifier.value = value ?? false;
   }
 
   void onFirstNameSubmitted(BuildContext context) {
@@ -593,7 +609,7 @@ class ProfileInfoViewModel extends ChangeNotifier {
       return null;
     }
     isPhoneError = true;
-    var result = FormValidators.validatePhone(value!.replaceAll('-', ''));
+    var result = FormValidators.validatePhone(selectedPhoneNumber.value, value);
     if (result == null) {
       isPhoneError = false;
     }

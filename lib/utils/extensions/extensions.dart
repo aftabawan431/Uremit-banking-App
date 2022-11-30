@@ -28,7 +28,7 @@ extension ScaffoldHelper on BuildContext? {
             style: TextStyle(fontSize: 12.sp),
           ),
           backgroundColor: backgroundColor,
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 3),
           shape: const StadiumBorder(),
           margin: const EdgeInsets.only(bottom: 100, left: 40, right: 40),
           padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 16.h),

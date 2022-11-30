@@ -3,9 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/customs/custom_app_bar.dart';
 import 'package:uremit/app/widgets/customs/tabview/custom_tab_view.dart';
-import 'package:uremit/features/payment/payment_wrapper/presentation/widgets/payment_header.dart';
 import 'package:uremit/features/payment/receiver_info/presentation/pages/receiver_info_page.dart';
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
+import 'package:uremit/features/receivers/presentation/widgets/payment_header.dart';
 
 class AddReceiverInfoContent extends StatefulWidget {
   const AddReceiverInfoContent({Key? key}) : super(key: key);
@@ -16,6 +16,12 @@ class AddReceiverInfoContent extends StatefulWidget {
 
 class _AddReceiverInfoContentState extends State<AddReceiverInfoContent> {
   @override
+  void initState() {
+    context.read<ReceiverViewModel>().getPaymentHeaderDetails();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -23,7 +29,7 @@ class _AddReceiverInfoContentState extends State<AddReceiverInfoContent> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const PaymentHeader(),
+          PaymentHeader(),
           SizedBox(height: 10.h),
           CustomTabView(
             key: context.read<ReceiverViewModel>().bottomNavigationKey,

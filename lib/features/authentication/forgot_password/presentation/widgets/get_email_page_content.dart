@@ -19,6 +19,7 @@ class GetEmailPageContent extends StatefulWidget {
 class _GetEmailPageContentState extends State<GetEmailPageContent> {
   @override
   void initState() {
+    context.read<ForgotPasswordViewModel>().isForgotPasswordLoadingNotifier.value=false;
     context.read<ForgotPasswordViewModel>().clearGetEmailFields();
     context.read<ForgotPasswordViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
     super.initState();
@@ -29,7 +30,7 @@ class _GetEmailPageContentState extends State<GetEmailPageContent> {
     print('Widget Building');
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const CustomAppBar(title: 'Forgot Password', showBackButton: false),
+      appBar: const CustomAppBar(title: 'Forgot Password', ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,6 +78,8 @@ class _GetEmailPageContentState extends State<GetEmailPageContent> {
                         text: 'Send',
                         loadingNotifier: context.read<ForgotPasswordViewModel>().isForgotPasswordLoadingNotifier,
                         onPressed: () {
+                          FocusScope.of(context).unfocus();
+
                           context.read<ForgotPasswordViewModel>().isButtonPressed = true;
                           if (!context.read<ForgotPasswordViewModel>().getEmailFormKey.currentState!.validate()) {
                             return;

@@ -34,8 +34,9 @@ class ContinueButton extends StatelessWidget {
             return ElevatedButton(
               child: (isLoading)
                   ? CircularProgressIndicator.adaptive(
+                     backgroundColor: Colors.white30,
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).scaffoldBackgroundColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     )
                   : Text(text, style: Theme.of(context).textTheme.button),
               onPressed: shouldButtonBeEnabled(isEnabled, isLoading) ? onPressed : null,

@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.3+4
 
 environment:
   sdk: ">=2.16.1 <3.0.0"
@@ -46,7 +46,8 @@ dependencies:
   internet_connection_checker: ^0.0.1+3
 
   # For image selection from gallery or storage
-  image_picker: ^0.8.4+4
+  image_picker: ^0.8.5+3
+
   logger: any
   # For file selection from storage
   file_picker: ^4.3.2
@@ -88,7 +89,7 @@ dependencies:
   multi_value_listenable_builder: ^0.0.2
 
   # For OTP Code
-  pin_code_fields: ^7.3.0
+  pin_code_fields: ^7.4.0
 
   # For animated dialog
   flutter_animated_dialog: ^2.0.1
@@ -128,6 +129,34 @@ dependencies:
 
   #For on/off indication of button
   flutter_switch: ^0.3.2
+
+  # for opening files
+  open_file: ^3.2.1
+
+  #to provide paths of different directories on mobile
+  path_provider: ^2.0.10
+
+  #to get differnet permissions from user
+  permission_handler: ^9.2.0
+
+  #to take screenshot of a widget
+  screenshot: ^1.2.3
+
+  # to share files
+  share_plus: ^4.0.4
+
+  # to store image
+  image_gallery_saver: '^1.7.1'
+
+  # to show web browsers
+  webview_flutter: ^3.0.4
+
+  network_info_plus: ^2.1.3
+
+  phone_numbers_parser: ^7.0.0
+
+  country_calling_code_picker: ^2.0.1
+
 
 dev_dependencies:
   flutter_test:

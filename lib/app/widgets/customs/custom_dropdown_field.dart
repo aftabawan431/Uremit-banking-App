@@ -90,7 +90,9 @@ class CustomDropDown extends StatelessWidget {
               onTap: onTap,
               items: [
                 DropdownMenuItem<CircularProgressIndicator>(
-                  value: const CircularProgressIndicator(),
+                  value: const CircularProgressIndicator.adaptive(
+                    strokeWidth: 2,
+                  ),
                   enabled: false,
                   child: SizedBox(
                     height: 75.h,

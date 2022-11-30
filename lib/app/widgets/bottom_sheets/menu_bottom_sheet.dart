@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:uremit/app/widgets/bottom_sheets/widgets/profile_avatar.dart';
 import 'package:uremit/features/home/presentation/manager/home_view_model.dart';
@@ -11,11 +10,11 @@ import 'package:uremit/utils/constants/app_level/app_assets.dart';
 import 'package:uremit/utils/router/app_state.dart';
 import 'package:uremit/utils/router/models/page_action.dart';
 import 'package:uremit/utils/router/models/page_config.dart';
-import 'package:uremit/utils/router/uremit_router_delegate.dart';
 
 import '../../../features/authentication/login/presentation/manager/login_view_model.dart';
 import '../../../utils/constants/enums/page_state_enum.dart';
 import '../../../utils/globals/app_globals.dart';
+import '../../../utils/router/uremit_router_delegate.dart';
 import '../../globals.dart';
 
 final HomeViewModel _viewModel = sl();
@@ -96,7 +95,7 @@ class MenuBottomSheet {
                     children: [
                       _menuItem(
                         context: context,
-                        title: 'My Account',
+                        title: 'My Profile',
                         leading: AppAssets.icAccountSvg,
                         onTap: () {
                           globalHomeContext = null;
@@ -107,11 +106,11 @@ class MenuBottomSheet {
                           // });
                         },
                       ),
-                      _menuItem(context: context, title: 'Invite Friends', leading: AppAssets.icInviteSvg),
-                      _menuItem(context: context, title: 'Track Your Transaction', leading: AppAssets.icTrackSvg),
-                      _menuItem(context: context, title: 'Privacy Policy', leading: AppAssets.icPrivacyPolicySvg),
-                      _menuItem(context: context, title: 'Contact Us', leading: AppAssets.icContactSvg),
-                      _menuItem(context: context, title: 'Terms & Conditions', leading: AppAssets.icDocumentSvg),
+                      _menuItem(context: context, title: 'Invite Friends', textColor: Colors.grey, leading: AppAssets.icInviteSvg),
+                      _menuItem(context: context, title: 'Track Your Transaction', textColor: Colors.grey, leading: AppAssets.icTrackSvg),
+                      _menuItem(context: context, title: 'Privacy Policy', textColor: Colors.grey, leading: AppAssets.icPrivacyPolicySvg),
+                      _menuItem(context: context, title: 'Contact Us', textColor: Colors.grey, leading: AppAssets.icContactSvg),
+                      _menuItem(context: context, title: 'Terms & Conditions', textColor: Colors.grey, leading: AppAssets.icDocumentSvg),
                       // _menuItem(context: context, title: 'Document Required', leading: AppAssets.icDocumentSvg),
                       _menuItem(
                         context: context,
@@ -131,15 +130,17 @@ class MenuBottomSheet {
       },
     ).then((value) {
       globalHomeContext = null;
-
     });
   }
 
-  Widget _menuItem({required BuildContext context, required String title, required String leading, Function()? onTap}) {
+  Widget _menuItem({required BuildContext context, required String title, Color? textColor, required String leading, Function()? onTap}) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: SvgPicture.asset(leading),
-      title: Text(title, style: Theme.of(context).textTheme.bodyText1),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyText1!.copyWith(color: textColor),
+      ),
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
       onTap: onTap,
     );

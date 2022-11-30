@@ -10,8 +10,9 @@ class PageAction extends Equatable {
   final PageConfiguration? page;
   final Widget? widget;
   final Map<String, dynamic>? arguments;
+  final List<PageConfiguration>? pages;
 
-  const PageAction({this.state = PageState.none, this.page, this.widget, this.arguments});
+  const PageAction({this.state = PageState.none, this.page, this.widget, this.arguments, this.pages});
 
   @override
   List<Object?> get props => [state, page, widget, arguments];

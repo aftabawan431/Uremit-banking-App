@@ -17,6 +17,8 @@ import 'package:uremit/features/dashboard/models/get_promotion_list_request_mode
 import 'package:uremit/features/dashboard/models/get_promotion_list_response_model.dart';
 import 'package:uremit/features/files/previous_files/models/get_previous_file_response_model.dart';
 import 'package:uremit/features/files/previous_files/models/get_previous_files_request_model.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approval_response_model.dart';
+import 'package:uremit/features/home/models/get_profile_admin_approvel_request_model.dart';
 import 'package:uremit/features/menu/profile/models/get_profile_details_request_model.dart';
 import 'package:uremit/features/menu/profile/models/get_profile_details_response_model.dart';
 import 'package:uremit/features/menu/security/models/change_password_request_model.dart';
@@ -26,14 +28,20 @@ import 'package:uremit/features/menu/update_profile/models/doc_type_request_mode
 import 'package:uremit/features/menu/update_profile/models/doc_type_response_model.dart';
 import 'package:uremit/features/payment/pay_id/modal/insert_payment_proof_response_modal.dart';
 import 'package:uremit/features/payment/pay_id/modal/insert_payment_response_request_modal.dart';
-import 'package:uremit/features/payment/receipt_screen/modal/getPaymentMethodResponseModal.dart';
+import 'package:uremit/features/payment/payment_details/models/get_receiver_currencies_request_model.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_Payment_Method_Response_Model.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_transaction_by%20_txn_response_model.dart';
+import 'package:uremit/features/payment/receipt_screen/modal/get_transaction_by_txn_request_model.dart';
 import 'package:uremit/features/payment/receipt_screen/modal/insert_payment_response_modal.dart';
 import 'package:uremit/features/payment/receipt_screen/modal/insert_payment_transfer_request_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_administrative_charges_list_response_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_admistrative_charges_list_request_model.dart';
 import 'package:uremit/features/payment/receiver_info/models/receiver_add_request_list_model.dart';
 import 'package:uremit/features/receivers/models/delete_receiver_request_model.dart';
 import 'package:uremit/features/receivers/models/delete_receiver_response_model.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_request_model.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_response_model.dart';
+import 'package:uremit/features/receivers/models/payment_header_response_model.dart';
 import 'package:uremit/features/receivers/models/receiver_list_request_model.dart';
 import 'package:uremit/features/receivers/models/receiver_list_response_model.dart';
 import 'package:uremit/services/error/failure.dart';
@@ -55,14 +63,22 @@ import '../../features/menu/documents/models/document_required_response_model.da
 import '../../features/menu/update_profile/models/countries_province_request_model.dart';
 import '../../features/menu/update_profile/models/get_countries_response_model.dart';
 import '../../features/payment/payment_details/models/get_rate_lists_response_model.dart';
+import '../../features/payment/payment_details/models/get_receiver_currencies_response_model.dart';
+import '../../features/payment/payment_details/models/update_transaction_status_request_model.dart';
+import '../../features/payment/payment_details/models/update_transaction_status_response_model.dart';
 import '../../features/payment/personal_info/models/set_profile_details_request_model.dart';
+import '../../features/payment/receipt_screen/modal/get_payment_methods_request_model.dart';
+import '../../features/payment/receiver_info/models/get_uremit_banks_countires_response_model.dart';
 import '../../features/payment/receiver_info/models/receiver_add_response_list_model.dart';
 import '../../features/receivers/models/add_receiver_bank_request_model.dart';
 import '../../features/receivers/models/add_receiver_bank_response_model.dart';
 import '../../features/receivers/models/delete_receiver_bank_request_model.dart';
 import '../../features/receivers/models/delete_receiver_bank_response_model.dart';
+import '../../features/receivers/models/payment_header_request_model.dart';
 import '../../features/receivers/models/update_receiver_nickname_request_model.dart';
 import '../../features/receivers/models/update_receiver_nickname_response_model.dart';
+import '../../features/receivers/models/validate_bank_request_model.dart';
+import '../../features/receivers/models/validate_bank_response_model.dart';
 
 abstract class Repository {
   /// This method register the user against their credentials (email and phone number)
@@ -107,6 +123,12 @@ abstract class Repository {
   /// if unsuccessful the response will be [Failure]
   Future<Either<Failure, GetCountriesResponseModel>> getCountries(NoParams params);
 
+  /// This method gets the countries list associated with uremit
+  /// [Input]: [NoParams] contains no params
+  /// [Output] : if operation successful returns [GetUremitBanksCountriesResponseModel] returns the countries list  associated with uremit
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, GetUremitBanksCountriesResponseModel>> getUremitBanksCountries(NoParams params);
+
   /// This method gets the rate list for the countries
   /// [Input]: [NoParams] contains no params
   /// [Output] : if operation successful returns [GetRateListResponseModel] returns the rate list
@@ -136,6 +158,12 @@ abstract class Repository {
   /// [Output] : if operation successful returns [DeleteCardResponseModel] returns the deletion of specific card
   /// if unsuccessful the response will be [Failure]
   Future<Either<Failure, DeleteCardResponseModel>> deleteCard(DeleteCardRequestModel params);
+
+  /// This method validate the bank against bank account no. and bank id
+  /// [Input]: [ValidateBankRequestModel] contains the bank account no. and bank id
+  /// [Output] : if operation successful returns [ValidateBankResponseModel] returns the account details like num,title and etc
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, ValidateBankResponseModel>> validateBank(ValidateBankRequestModel params);
 
   /// This method get the old password from the user
   /// [Input]: [ChangePasswordRequestModel] contains the old password and newPassword with userId
@@ -203,6 +231,12 @@ abstract class Repository {
   /// if unsuccessful the response will be [Failure]
   Future<Either<Failure, ProfileImageResponseModel>> profileImage(ProfileImageRequestModel params);
 
+  /// This method is to get the admin approvel status of the user update profile
+  /// [Input]: [GetProfileAdminApprovelRequestModel] contains the user id
+  /// [Output] : if operation successful returns [GetProfileAdminApprovelResponseModel] returns the the status of profile image approval
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, GetProfileAdminApprovelResponseModel>> profileAdminApprovel(GetProfileAdminApprovelRequestModel params);
+
   /// This method is to add the bank of receiver side
   /// [Input]: [AddReceiverBankRequestModel] contains the userId,receiverId,accountNo,branchCode etc
   /// [Output] : if operation successful returns [AddReceiverBankResponseModel] returns the status of creating the account by True/false.
@@ -226,6 +260,18 @@ abstract class Repository {
   /// [Output] : if operation successful returns [GetBankListResponseModel] returns the bankId and name
   /// if unsuccessful the response will be [Failure]
   Future<Either<Failure, GetBankListResponseModel>> getBankList(GetBankListRequestModel params);
+
+  /// This method is to get the payment details in receiver details info
+  /// [Input]: [PaymentHeaderRequestModel] contains the userId
+  /// [Output] : if operation successful returns [PaymentHeaderResponseModel] returns the SenderCountryUnitValue and BirthCountryExchangeValue
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, PaymentHeaderResponseModel>> getPaymentHeaderDetails(PaymentHeaderRequestModel params);
+
+  /// This method is to GetAdministrativeChargesList
+  /// [Input]: [GetAdministrativeChargesListRequestModel] contains the countryID
+  /// [Output] : if operation successful returns [GetAdministrativeChargesListResponseModel] returns the admin fee
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, GetAdministrativeChargesListResponseModel>> getAdministrativeChargesLists(GetAdministrativeChargesListRequestModel params);
 
   /// This method is to add the new receiver
   /// [Input]: [ReceiverAddRequestListModel] contains the userId,firstName,middle and last name and email etc
@@ -254,17 +300,32 @@ abstract class Repository {
   /// This method is to get payment methods types
   /// [Output] : if operation successful returns [GetPaymentMethodResponseModal] returns the list of payment methods types
   /// if unsuccessful the response will be [Failure]
-  Future<Either<Failure, GetPaymentMethodResponseModal>> getPaymentMethods(NoParams params);
+  Future<Either<Failure, GetPaymentMethodResponseModal>> getPaymentMethods(GetPaymentMethodsRequestModel params);
 
   /// This method will send request to Insert Payment Transfer API
   /// [Input]: [InsertPaymentTransferRequestModel] contains the receipt information like method id , gateway id, receiver id etc
   /// [Output] : if operation successful returns [InsertPaymentTransferResponseModal] return the token and redirect URL
   /// if unsuccessful the response will be [Failure]
+  ///
   Future<Either<Failure, InsertPaymentTransferResponseModal>> insertPaymentTransfer(InsertPaymentTransferRequestModel params);
+
+  /// This method will send request to Insert Payment Transfer API
+  /// [Input]: [InsertPaymentTransferRequestModel] contains the receipt information like method id , gateway id, receiver id etc
+  /// [Output] : if operation successful returns [InsertPaymentTransferResponseModal] return the token and redirect URL
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, InsertPaymentTransferResponseModal>> updatePayment(InsertPaymentTransferRequestModel params);
 
   /// This method set the required documents by the uploadFile request api
   /// [Input]: [InsertPaymentTransferRequestModel] contains the userId
   /// [Output] : if operation successful returns [InsertPaymentTransferResponseModal] return the successfull message
   /// if unsuccessful the response will be [Failure]
   Future<Either<Failure, InsertPaymentProofResponseModal>> insertPaymentProof(InsertPaymentProofRequestModal params);
+
+  /// This method get the user details and update them
+  /// [Input]: [UpdateTransactionStatusRequestModel] contains the user information parameters like firstName,middleName etc
+  /// [Output] : if operation successful returns [UpdateTransactionStatusResponseModel] return the the update names and user's other information
+  /// if unsuccessful the response will be [Failure]
+  Future<Either<Failure, UpdateTransactionStatusResponseModel>> updateTransactionStatus(UpdateTransactionStatusRequestModel params);
+  Future<Either<Failure, GetReceiverCurrenciesResponseModel>> getReceiverCurrencies(GetReceiverCurrenciesRequestModel params);
+  Future<Either<Failure, GetTransactionByTxnResponseModel>> getTransactionByTxn(GetTransactionByTxnRequestModel params);
 }

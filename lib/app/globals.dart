@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 GlobalKey<NavigatorState> navigatorKeyGlobal = GlobalKey<NavigatorState>();
 final sl = GetIt.instance;
 
+
 const BoxDecoration backgroundGradient = BoxDecoration(
   gradient: RadialGradient(
     center: Alignment(0.5, -0.5),

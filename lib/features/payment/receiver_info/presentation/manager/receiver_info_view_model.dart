@@ -5,31 +5,51 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:radio_group_v2/radio_group_v2.dart';
+import 'package:uremit/features/payment/payment_details/presentation/manager/payment_details_view_model.dart';
+import 'package:uremit/features/payment/payment_wrapper/presentation/manager/payment_wrapper_view_model.dart';
+import 'package:uremit/features/payment/receipt_screen/presentation/manager/receipt_screen_view_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_admistrative_charges_list_request_model.dart';
+import 'package:uremit/features/payment/receiver_info/models/get_uremit_banks_countires_response_model.dart';
 import 'package:uremit/features/payment/receiver_info/models/receiver_add_request_list_model.dart';
+import 'package:uremit/features/payment/receiver_info/usecase/get_administrative_charges_list_usecase.dart';
+import 'package:uremit/features/payment/receiver_info/usecase/get_uremit_bank_countries_usecase.dart';
+import 'package:uremit/features/payment/receiver_info/usecase/validate_bank_usecase.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_request_model.dart';
 import 'package:uremit/features/receivers/models/get_bank_list_response_model.dart';
+import 'package:uremit/features/receivers/models/validate_bank_response_model.dart';
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
 import 'package:uremit/features/receivers/usecases/get_bank_list_usecase.dart';
 import 'package:uremit/services/models/on_error_message_model.dart';
+import 'package:uremit/utils/encryption/encryption.dart';
 
 import '../../../../../app/globals.dart';
 import '../../../../../app/providers/account_provider.dart';
 import '../../../../../services/error/failure.dart';
 import '../../../../../services/models/no_params.dart';
+import '../../../../../utils/constants/enums/page_state_enum.dart';
 import '../../../../../utils/router/app_state.dart';
+import '../../../../../utils/router/models/page_action.dart';
+import '../../../../../utils/router/models/page_config.dart';
 import '../../../../../utils/validators/form_validator.dart';
-import '../../../../menu/update_profile/models/get_countries_response_model.dart';
-import '../../../../menu/update_profile/usecases/get_countries_usecase.dart';
+import '../../../../receivers/models/validate_bank_request_model.dart';
 import '../../usecase/receiver_add_usecase.dart';
 
 class ReceiverInfoViewModel extends ChangeNotifier {
-  ReceiverInfoViewModel({required this.getCountriesUsecase, required this.getBankListUsecase, required this.receiverAddUsecase});
+  ReceiverInfoViewModel(
+      {required this.getUremitBanksCountriesUsecase,
+      required this.getAdministrativeChargesListUsecase,
+      required this.validateBankUsecase,
+      required this.getBankListUsecase,
+      required this.receiverAddUsecase});
   // Usecases
-  GetCountriesUsecase getCountriesUsecase;
+  GetUremitBanksCountriesUsecase getUremitBanksCountriesUsecase;
   ReceiverAddUsecase receiverAddUsecase;
+  ValidateBankUsecase validateBankUsecase;
+  GetAdministrativeChargesListUsecase getAdministrativeChargesListUsecase;
   GetBankListResponseModel? getBanks;
   GetBankListUsecase getBankListUsecase;
   GetBankListResponseModelBody? getBankListResponseModelBody;
+
   // Value Notifiers
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
@@ -37,7 +57,13 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   ValueNotifier<bool> isCountryLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isBanksListLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isReceiverAddLoadingNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isValidateLoadingNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isGetAdminFeeLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> middleNameNotifier = ValueNotifier(true);
+  ValueNotifier<bool> lastNameNotifier = ValueNotifier(true);
+  ValueNotifier<bool> isNepaliBank = ValueNotifier(false);
+  ValueNotifier<String?> selectedPhoneNumber = ValueNotifier('+61');
+
 
   bool isReceiverInfoPageChange = false;
   bool isNickNameError = false;
@@ -51,6 +77,8 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   // Properties
   final GlobalKey<FormState> receiverInfoFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> receiverBankInfoFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> receiverAccountNameInfoFormKey =
+      GlobalKey<FormState>();
   PageController pageController = PageController();
 
   final FocusNode nickNameFocusNode = FocusNode();
@@ -62,6 +90,11 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   final String firstNameHintText = 'Enter First Name';
   final TextEditingController firstNameController = TextEditingController();
   final FocusNode firstNameFocusNode = FocusNode();
+
+  final String addressLabelText = 'Address';
+  final String addressHintText = 'Enter Address';
+  final TextEditingController addressController = TextEditingController();
+  final FocusNode addressFocusNode = FocusNode();
 
   final String middleNameLabelText = 'Middle Name';
   final String middleNameHintText = 'Enter Middle Name';
@@ -76,15 +109,22 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   final FocusNode receiverCountryFocusNode = FocusNode();
   final String receiverCountryLabelText = 'Country';
   final String receiverCountryHintText = 'Select Country';
-  final TextEditingController receiverCountryController = TextEditingController();
+  final TextEditingController receiverCountryController =
+      TextEditingController();
 
   final FocusNode receiverEmailFocusNode = FocusNode();
   final String receiverEmailLabelText = 'Email';
-  final String receiverEmailHintText = 'Enter Email';
+  final String receiverEmailHintText = 'Enter email';
   final TextEditingController receiverEmailController = TextEditingController();
 
+  final FocusNode receiverRelationshipFocusNode = FocusNode();
+  final String receiverRelationshipLabelText = 'Relationship';
+  final String receiverRelationshipHintText = 'Enter Relationship';
+  final TextEditingController receiverRelationshipController =
+      TextEditingController();
+
   final String phoneLabelText = 'Contact Number';
-  final String phoneHintText = '+62xxxxxxxxxx';
+  final String phoneHintText = 'xxxxxxxxxxxx';
   final TextEditingController phoneController = TextEditingController();
   final FocusNode phoneFocusNode = FocusNode();
 
@@ -94,7 +134,8 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   final FocusNode accountHolderNameFocusNode = FocusNode();
   final String accountHolderNameLabelText = 'Account Holder Name';
   final String accountHolderNameHintText = 'Account Holder Name';
-  final TextEditingController accountHolderNameController = TextEditingController();
+  final TextEditingController accountHolderNameController =
+      TextEditingController();
 
   final FocusNode bankFocusNode = FocusNode();
   final String bankLabelText = 'Bank';
@@ -106,15 +147,31 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   final String accountNumberLabelText = 'Account Number';
   final String accountNumberHintText = 'Enter Account Number';
   final TextEditingController accountNumberController = TextEditingController();
+  final TextEditingController bankCodeController = TextEditingController();
+  final TextEditingController branchCodeController = TextEditingController();
 
   String countryId = '';
+  String countryCode = '';
+  double adminFee = 0.0;
+
+  double get adminFeeGet {
+    ReceiptScreenViewModel receiptScreenViewModel = sl();
+    if (receiptScreenViewModel.fromChangePaymentMethod ||
+        receiptScreenViewModel.isRepeatTransaction) {
+      return receiptScreenViewModel.updateTransaction!.adminFee;
+    }
+
+    return adminFee;
+  }
+
   // Getters
   AppState appState = GetIt.I.get<AppState>();
   ReceiverInfoViewModel get receiverInfoViewModel => sl();
 
   AccountProvider get _accountProvider => sl();
-  GetCountriesResponseModel? countriesList;
-  CountriesBody? receiverCountry;
+  GetUremitBanksCountriesResponseModel? countriesList;
+  GetUremitBanksCountriesResponseModelBody? receiverCountry;
+  ValidateBankResponseModelBody? validateBankResponseModelBody;
 
   clearFields() {
     nickNameController.text = '';
@@ -122,6 +179,7 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     lastNameController.text = '';
     receiverEmailController.text = '';
     phoneController.text = '';
+    selectedPhoneNumber.value='+61';
   }
   // Usecase Calls
 
@@ -130,29 +188,44 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     isReceiverAddLoadingNotifier.value = true;
     if (hasBank == true) {
       params = ReceiverAddRequestListModel(
+          relationShip: receiverRelationshipController.text,
           userID: _accountProvider.userDetails!.userDetails.id,
           nickName: nickNameController.text,
           firstName: firstNameController.text,
-          middleName: middleNameController.text,
-          lastName: lastNameController.text,
+          address: addressController.text,
+          middleName:
+              middleNameNotifier.value == true ? '' : middleNameController.text,
+          lastName:lastNameNotifier.value? '':lastNameController.text,
           email: receiverEmailController.text,
-          phone: phoneController.text,
-          countryID: '',
+          // phone: countryCode + phoneController.text,
+          phone:selectedPhoneNumber.value!+ phoneController.text,
           country: countryId,
           bank: ReceiverAddRequestListBank(
-              bankCode: bankController.text, accountNo: accountNumberController.text, accountTitle: accountHolderNameController.text, branchCode: '', isIban: 0));
+              bankCode: bankCodeController.text,
+              accountNo: accountNumberController.text,
+              accountTitle: accountHolderNameController.text,
+              branchCode: branchCodeController.text,
+              isIban: accountNumberController.text.length > 13 ? 1 : 0));
     } else {
       params = ReceiverAddRequestListModel(
+          relationShip: receiverRelationshipController.text,
           userID: _accountProvider.userDetails!.userDetails.id,
           nickName: nickNameController.text,
+          address: addressController.text,
           firstName: firstNameController.text,
-          middleName: middleNameController.text,
-          lastName: lastNameController.text,
+          middleName:
+              middleNameNotifier.value == true ? '' : middleNameController.text,
+          lastName:lastNameNotifier.value? '':lastNameController.text,
           email: receiverEmailController.text,
-          phone: phoneController.text,
-          countryID: '',
+          // phone: countryCode + phoneController.text,
+          phone:selectedPhoneNumber.value!+ phoneController.text,
           country: countryId,
-          bank: ReceiverAddRequestListBank(bankCode: '', accountNo: '', accountTitle: '', branchCode: '', isIban: 0));
+          bank: ReceiverAddRequestListBank(
+              bankCode: '',
+              accountNo: '',
+              accountTitle: '',
+              branchCode: '',
+              isIban: 0));
     }
     var addReceiverEither = await receiverAddUsecase.call(params);
 
@@ -165,7 +238,107 @@ class ReceiverInfoViewModel extends ChangeNotifier {
         clearAddReceiverInfo();
         context.read<ReceiverViewModel>().getReceiverList(recall: true);
         onErrorMessage?.call(
-          OnErrorMessageModel(message: 'Receiver Added Successfully', backgroundColor: Colors.green),
+          OnErrorMessageModel(
+              message: 'Receiver Added Successfully',
+              backgroundColor: Colors.green),
+        );
+        ReceiverViewModel receiverViewModel = sl();
+        if (receiverViewModel.isPaymentReceiver == false) {
+          receiverViewModel.moveToReceiversPage();
+        } else {
+          goBackToPaymentDetails();
+        }
+
+        Logger().i(response);
+      });
+    }
+  }
+
+  goBackToPaymentDetails() {
+    PaymentWrapperViewModel provier = sl();
+    provier.buttonTap(0);
+  }
+
+  Future<void> validateUserBank(
+    BuildContext context,
+  ) async {
+    var params;
+    isValidateLoadingNotifier.value = true;
+
+    params = ValidateBankRequestModel(
+      accountNumber: accountNumberController.text.trim(),
+      bankId: bankId.toString(),
+    );
+
+    var validateBankEither = await validateBankUsecase.call(params);
+
+    if (validateBankEither.isLeft()) {
+      handleError(validateBankEither);
+      isValidateLoadingNotifier.value = false;
+    } else if (validateBankEither.isRight()) {
+      validateBankEither.foldRight(null, (response, _) {
+        isValidateLoadingNotifier.value = false;
+
+        String titleOfAccount =
+            response.validateBankResponseModelBody.titleOfAccount;
+        ReceiverInfoViewModel receiverInfoViewModel = sl();
+        String fullName =
+            "${receiverInfoViewModel.firstNameController.text} ${receiverInfoViewModel.lastNameController.text}";
+        accountHolderNameController.text =
+            titleOfAccount.isEmpty ? fullName : titleOfAccount;
+        bankCodeController.text =
+            response.validateBankResponseModelBody.bankCode;
+        branchCodeController.text =
+            response.validateBankResponseModelBody.branchCode;
+        isValidateLoadingNotifier.value = false;
+        onErrorMessage?.call(
+          OnErrorMessageModel(
+              message: 'Validated', backgroundColor: Colors.green),
+        );
+        Logger().i(response);
+      });
+    }
+  }
+
+  Future<void> getAdminFee() async {
+    var params;
+    isGetAdminFeeLoadingNotifier.value = true;
+
+    params = GetAdministrativeChargesListRequestModel(
+        id: Encryption.encryptObject(receiverInfoViewModel.countryId));
+
+    var getAdminFeeEither =
+        await getAdministrativeChargesListUsecase.call(params);
+
+    if (getAdminFeeEither.isLeft()) {
+      handleError(getAdminFeeEither);
+      isGetAdminFeeLoadingNotifier.value = false;
+    } else if (getAdminFeeEither.isRight()) {
+      getAdminFeeEither.foldRight(null, (response, _) {
+        isGetAdminFeeLoadingNotifier.value = false;
+        PaymentDetailsViewModel paymentDetailsViewModel = sl();
+        adminFee = 0.0;
+        for (var i = 0; i < response.Body.length; i++) {
+          if (double.parse(paymentDetailsViewModel.sendMoneyController.text) >=
+                  response.Body[i].startAmount &&
+              double.parse(paymentDetailsViewModel.sendMoneyController.text) <=
+                  response.Body[i].endAmount) {
+            adminFee = response.Body[i].charges.toDouble();
+            break;
+          }
+          print('hey vro this is admin fee $adminFee');
+        }
+        print('hi');
+        appState.currentAction = PageAction(
+            state: PageState.addPage,
+            page: PageConfigs.receiptScreenPageConfig);
+
+        // Logger().w('hello this is the response of getAdminFee ${response.Body}');
+        // print('hello this is the response of getAdminFee ${response.Body}');
+        isGetAdminFeeLoadingNotifier.value = false;
+        onErrorMessage?.call(
+          OnErrorMessageModel(
+              message: 'Got Admin Fee', backgroundColor: Colors.green),
         );
         Logger().i(response);
       });
@@ -174,22 +347,31 @@ class ReceiverInfoViewModel extends ChangeNotifier {
 
   clearAddReceiverInfo() {
     nickNameController.clear();
+    middleNameNotifier.value=false;
+    lastNameNotifier.value=false;
     firstNameController.clear();
     middleNameController.clear();
+    addressController.clear();
     lastNameController.clear();
     receiverCountryController.clear();
     receiverEmailController.clear();
     phoneController.clear();
+    bankId == '';
+    bankController.clear();
+    receiverRelationshipController.clear();
+    accountNumberController.clear();
+    accountHolderNameController.clear();
   }
 
-  Future<void> getReceiverCountries() async {
+  Future<void> getUremitBankReceiverCountries() async {
     if (countriesList != null) {
       return;
     }
 
     isCountryLoadingNotifier.value = true;
 
-    var getReceiverCountriesEither = await getCountriesUsecase.call(NoParams());
+    var getReceiverCountriesEither =
+        await getUremitBanksCountriesUsecase.call(NoParams());
 
     if (getReceiverCountriesEither.isLeft()) {
       handleError(getReceiverCountriesEither);
@@ -197,6 +379,7 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     } else if (getReceiverCountriesEither.isRight()) {
       getReceiverCountriesEither.foldRight(null, (response, _) {
         countriesList = response;
+        print('these are the uremit countries $countriesList');
       });
       isCountryLoadingNotifier.value = false;
     }
@@ -209,7 +392,8 @@ class ReceiverInfoViewModel extends ChangeNotifier {
 
     isBanksListLoadingNotifier.value = true;
 
-    var getBanksEither = await getBankListUsecase(GetBankListRequestModel(countryId));
+    var getBanksEither =
+        await getBankListUsecase(GetBankListRequestModel(countryId));
 
     if (getBanksEither.isLeft()) {
       print('aftab1');
@@ -225,6 +409,38 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   }
 
   // Methods
+  bool isBankInfoPageChange = false;
+  void validateFirstPage() {
+    isReceiverInfoPageChange = true;
+    if (!receiverInfoFormKey.currentState!.validate()) {
+      pageController.animateToPage(0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOutCubic);
+    }
+  }
+
+  void validateSecondPage() {
+    isBankInfoPageChange = true;
+    if (!receiverBankInfoFormKey.currentState!.validate()) {
+      pageController.animateToPage(1,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOutCubic);
+    }
+  }
+
+  void onPageChange(int index) {
+    if (index > 0 && index <= 1) {
+      validateFirstPage();
+      ReceiverInfoViewModel receiverInfoViewModel=sl();
+      FocusScope.of(navigatorKeyGlobal.currentContext!).requestFocus(receiverInfoViewModel.bankFocusNode);
+
+
+
+
+    } else if (index > 1 && index <= 2) {
+      validateSecondPage();
+    }
+  }
 
   bool validateReceiverInfo() {
     isReceiverInfoPageChange = true;
@@ -233,7 +449,11 @@ class ReceiverInfoViewModel extends ChangeNotifier {
   }
 
   bool validateBankInfo() {
-    return receiverInfoFormKey.currentState!.validate();
+    return receiverBankInfoFormKey.currentState!.validate();
+  }
+
+  bool validateAccountNameInfo() {
+    return receiverAccountNameInfoFormKey.currentState!.validate();
   }
 
   void onNickNameSubmitted(BuildContext context) {
@@ -244,6 +464,10 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     FocusScope.of(context).requestFocus(middleNameFocusNode);
   }
 
+  void onAddressSubmitted(BuildContext context) {
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
   void onMiddleNameSubmitted(BuildContext context) {
     FocusScope.of(context).requestFocus(lastNameFocusNode);
   }
@@ -252,20 +476,28 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     middleNameNotifier.value = value ?? false;
   }
 
+  void onLastCheckboxClicked(bool? value) {
+    lastNameNotifier.value = value ?? false;
+  }
+
   void onLastNameSubmitted(BuildContext context) {
     FocusScope.of(context).requestFocus(receiverCountryFocusNode);
   }
 
   void onReceiverCountrySubmitted(BuildContext context) {
-    FocusScope.of(context).requestFocus(receiverEmailFocusNode);
+    FocusScope.of(context).requestFocus(receiverRelationshipFocusNode);
   }
 
   void onReceiverEmailSubmitted(BuildContext context) {
     FocusScope.of(context).requestFocus(phoneFocusNode);
   }
 
+  void onReceiverRelationshipSubmitted(BuildContext context) {
+    FocusScope.of(context).requestFocus(receiverEmailFocusNode);
+  }
+
   void onContactSubmitted(BuildContext context) {
-    FocusScope.of(context).requestFocus(FocusNode());
+    FocusScope.of(context).requestFocus(addressFocusNode);
   }
 
   void onBankSubmitted(BuildContext context) {
@@ -303,7 +535,25 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     return result;
   }
 
+  String? validateAddress(String? value) {
+    if (!isReceiverInfoPageChange) {
+      return null;
+    }
+    isFirstNameError = true;
+    var result = FormValidators.validateAddress(value?.trim());
+    if (result == null) {
+      isFirstNameError = false;
+    }
+    return result;
+  }
+
   void onFirstNameChange(String value) {
+    isReceiverInfoPageChange = false;
+    if (isFirstNameError) {
+      receiverInfoFormKey.currentState!.validate();
+    }
+  }
+  void onAddressChange(String value) {
     isReceiverInfoPageChange = false;
     if (isFirstNameError) {
       receiverInfoFormKey.currentState!.validate();
@@ -367,6 +617,18 @@ class ReceiverInfoViewModel extends ChangeNotifier {
     }
   }
 
+  String? validateRelationShip(String? value) {
+    if (!isReceiverInfoPageChange) {
+      return null;
+    }
+    isEmailError = true;
+    var result = FormValidators.validateFiled(value?.trim());
+    if (result == null) {
+      isEmailError = false;
+    }
+    return result;
+  }
+
   String? validateEmail(String? value) {
     if (!isReceiverInfoPageChange) {
       return null;
@@ -411,7 +673,7 @@ class ReceiverInfoViewModel extends ChangeNotifier {
       return null;
     }
     isPhoneError = true;
-    var result = FormValidators.validatePhone(value!.replaceAll('-', ''));
+    var result = FormValidators.validatePhone(selectedPhoneNumber.value, value);
     if (result == null) {
       isPhoneError = false;
     }
@@ -438,6 +700,12 @@ class ReceiverInfoViewModel extends ChangeNotifier {
               OnErrorMessageModel(message: l.message),
             ),
         (r) => null);
+  }
+
+  void loadProfileData(ValidateBankResponseModelBody? bankDetails) {
+    if (bankDetails != null) {
+      accountNumberController.text = bankDetails.titleOfAccount;
+    }
   }
 
 // Page Moves

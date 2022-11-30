@@ -24,7 +24,6 @@ import '../../features/authentication/forgot_password/presentation/pages/reset_p
 import '../../features/home/presentation/manager/home_view_model.dart';
 import '../../features/menu/profile/presentation/widgets/pagination/interactive_image.dart';
 import '../../features/payment/receipt_screen/presentation/widgets/summary_details_screen_page_content.dart';
-import '../../features/receivers/presentation/widgets/receiver_page_content.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../constants/enums/page_state_enum.dart';
 import 'app_state.dart';
@@ -32,6 +31,7 @@ import 'pages.dart';
 
 BuildContext?
     globalHomeContext; // doing this to pop the bottom sheet on home screen
+BuildContext? globalReceiptContext;
 
 class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<PageConfiguration> {
@@ -67,6 +67,7 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
   }
 
   List<Page> buildPages() {
+
     switch (appState.currentAction.state) {
       case PageState.none:
         break;
@@ -81,7 +82,11 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
         pop();
         break;
       case PageState.addAll:
-        // TODO: Handle this case.
+        // _pages.clear();
+        appState.currentAction.pages!.forEach((route) {
+          addPage(route);
+        });
+
         break;
       case PageState.addWidget:
         // TODO: Handle this case.
@@ -91,6 +96,17 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
         break;
       case PageState.replaceAll:
         replaceAll(appState.currentAction.page!);
+        break;
+      case PageState.removeMany:
+        for (var route in appState.currentAction.pages!) {
+          removePage(route);
+        }
+        break;
+      case PageState.removeManyAddPage:
+        for (var route in appState.currentAction.pages!) {
+          removePage(route);
+        }
+        addPage(appState.currentAction.page!);
         break;
     }
     return List.of(_pages);
@@ -109,8 +125,11 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
   }
 
   void removePage(PageConfiguration page) {
-    if (_pages.isEmpty) {
-      pages.remove(page);
+    if (_pages.isNotEmpty) {
+      int index = _pages.indexWhere((element) => element.name == page.path);
+      if (index != -1) {
+        _pages.removeAt(index);
+      }
     }
   }
 
@@ -124,7 +143,7 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
       switch (pageConfig.uiPage) {
         case Pages.splashPage:
           _addPageData(const SplashPage(), pageConfig);
-          // _addPageData(const DashboardPage(), pageConfig);
+          // _addPageData(const PayIdInfoPage(), pageConfig);
           break;
         case Pages.authWrapperPage:
           _addPageData(const AuthWrapperPage(), pageConfig);
@@ -215,6 +234,12 @@ class UremitRouterDelegate extends RouterDelegate<PageConfiguration>
   }
 
   void pop() {
+    if (globalReceiptContext != null) {
+      Navigator.of(globalReceiptContext!).pop();
+      globalReceiptContext = null;
+      return;
+    }
+
     if (globalHomeContext != null) {
       Navigator.of(globalHomeContext!).pop();
       globalHomeContext = null;

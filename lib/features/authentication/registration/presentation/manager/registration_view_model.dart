@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:password_strength/password_strength.dart';
 import 'package:uremit/features/authentication/registration/models/registration_request_model.dart';
 import 'package:uremit/features/authentication/registration/usecases/registration_usecase.dart';
@@ -29,7 +30,8 @@ class RegistrationViewModel extends ChangeNotifier {
   ValueNotifier<bool> promotionalCheckNotifier = ValueNotifier(false);
   ValueNotifier<bool> isPasswordStrengthVisible = ValueNotifier(false);
   ValueNotifier<String> passwordStrengthStr = ValueNotifier('');
-  ValueNotifier<Color> passwordStrengthColor = ValueNotifier(Colors.transparent);
+  ValueNotifier<Color> passwordStrengthColor =
+      ValueNotifier(Colors.transparent);
 
   bool isEmailError = false;
   bool isPasswordError = false;
@@ -45,14 +47,16 @@ class RegistrationViewModel extends ChangeNotifier {
   final FocusNode emailFocusNode = FocusNode();
 
   final String passwordLabelText = 'Password';
-  final String passwordHintText = 'Enter Password';
+  final String passwordHintText = 'Choose Password';
   final TextEditingController passwordController = TextEditingController();
   final FocusNode passwordFocusNode = FocusNode();
 
   final String phoneLabelText = 'Phone';
-  final String phoneHintText = '+62 xxxxxxxxx';
+  final String phoneHintText = 'xxxxxxxxxxx';
   final TextEditingController phoneController = TextEditingController();
   final FocusNode phoneFocusNode = FocusNode();
+
+  ValueNotifier<String?> selectedPhoneNumber = ValueNotifier('+61');
 
   // Getters
   AppState appState = GetIt.I.get<AppState>();
@@ -71,8 +75,9 @@ class RegistrationViewModel extends ChangeNotifier {
       companyId: 1,
       isSubscribed: false,
       referralCode: '',
-      phoneNumber: phoneController.text.replaceAll('-', ''),
+      phoneNumber:selectedPhoneNumber.value!+ phoneController.text.replaceAll('-', ''),
     );
+
 
     var registrationEither = await registrationUsecase.call(params);
 
@@ -81,11 +86,23 @@ class RegistrationViewModel extends ChangeNotifier {
       isLoadingNotifier.value = false;
     } else if (registrationEither.isRight()) {
       registrationEither.foldRight(null, (response, previous) {
-        onErrorMessage?.call(OnErrorMessageModel(message: response.registrationDetails.message, backgroundColor: Colors.green));
+        onErrorMessage?.call(OnErrorMessageModel(
+            message: response.registrationDetails.message,
+            backgroundColor: Colors.green));
       });
       isLoadingNotifier.value = false;
+
       moveToOtp();
     }
+  }
+
+  clearFields() {
+    emailController.clear();
+    passwordController.clear();
+    phoneController.clear();
+    isPasswordStrengthVisible.value = false;
+    selectedPhoneNumber.value = '+61';
+    // passwordStrengthStr.value = false;
   }
 
   // Methods
@@ -144,7 +161,8 @@ class RegistrationViewModel extends ChangeNotifier {
     if (result?.isEmpty ?? false) {
       onErrorMessage?.call(
         OnErrorMessageModel(
-          message: 'Password must be of minimum 6 characters, at least one uppercase letter, one lowercase letter, one number and one special character',
+          message:
+              'Password must be of minimum 6 characters, at least one uppercase letter, one lowercase letter, one number and one special character',
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -165,11 +183,13 @@ class RegistrationViewModel extends ChangeNotifier {
       return null;
     }
     isPhoneError = true;
-    var result = FormValidators.validatePhone(value!.replaceAll('-', ''));
-    if (result == null) {
-      isPhoneError = false;
-    }
-    return result;
+
+  var result = FormValidators.validatePhone(selectedPhoneNumber.value,value);
+  if(result==null){
+    isPhoneError = false;
+
+  }
+  return result;
   }
 
   void onPhoneChange(String value) {
@@ -216,12 +236,16 @@ class RegistrationViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
   // Page Moves
   void moveToOtp() {
     // resetFields();
-    appState.currentAction = PageAction(state: PageState.addPage, page: PageConfigs.otpPageConfig);
+
+    appState.currentAction =
+        PageAction(state: PageState.addPage, page: PageConfigs.otpPageConfig);
   }
 }

@@ -28,7 +28,8 @@ abstract class AuthDataSource {
   /// [Input]: [RegistrationRequestModel] contains the user information
   /// [Output] : if operation successful returns [RegistrationResponseModel] returns the user email
   /// if unsuccessful the response will be [Failure]
-  Future<RegistrationResponseModel> registerUser(RegistrationRequestModel params);
+  Future<RegistrationResponseModel> registerUser(
+      RegistrationRequestModel params);
 
   /// This method login the user as the email and the number which he have registered
   /// [Input]: [LoginRequestModel] contains the user information
@@ -46,7 +47,8 @@ abstract class AuthDataSource {
   /// [Input]: [ResetPasswordRequestModel] contains the user old password
   /// [Output] : if operation successful returns [ResetPasswordResponseModel] returns the screen
   /// if unsuccessful the response will be [Failure]
-  Future<ResetPasswordResponseModel> resetPassword(ResetPasswordRequestModel params);
+  Future<ResetPasswordResponseModel> resetPassword(
+      ResetPasswordRequestModel params);
 
   /// This method is implemented when forgot his password and want to approach his password
   /// [Input]: [ForgotPasswordRequestModel] contains the email
@@ -72,7 +74,8 @@ class AuthDataSourceImp implements AuthDataSource {
   AuthDataSourceImp({required this.dio});
 
   @override
-  Future<RegistrationResponseModel> registerUser(RegistrationRequestModel params) async {
+  Future<RegistrationResponseModel> registerUser(
+      RegistrationRequestModel params) async {
     String url = AppUrl.baseUrl + AppUrl.registerUrl;
     print(jsonEncode(params));
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
@@ -98,18 +101,19 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-
         print(exception.response?.data['Text']);
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         Logger().v(decryptedResponse);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
-        if(jsonResponse['StatusCode']=='400'){
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
+        throw SomethingWentWrong(errorResponseModel.body[0]);
+        if (jsonResponse['StatusCode'] == '400') {
           throw const SomethingWentWrong('User already found');
-        }else{
-          throw SomethingWentWrong(errorResponseModel.statusMessage);
+        } else {
+          throw SomethingWentWrong(errorResponseModel.body[0]);
         }
-
       }
     }
   }
@@ -121,7 +125,7 @@ class AuthDataSourceImp implements AuthDataSource {
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
 
     print(jsonEncode(params));
-    print('this is the jsonEncode  ${jsonEncode(params)}');
+    print('this is the paramß  $params');
     print('this is the encryptedjson request $encryptedJson');
 
     try {
@@ -133,7 +137,6 @@ class AuthDataSourceImp implements AuthDataSource {
       var decryptedResponse = Encryption.decryptObject(response.data['Text']);
 
       var jsonResponse = jsonDecode(decryptedResponse);
-      print('this is the decoded data response dear aftab $jsonResponse');
 
       if (response.statusCode == 200 && jsonResponse['StatusCode'] == '200') {
         return LoginResponseModel.fromJson(jsonResponse);
@@ -143,16 +146,17 @@ class AuthDataSourceImp implements AuthDataSource {
     } on DioError catch (exception) {
       print(exception.response?.statusCode);
       print(exception.response?.statusMessage);
-      Logger().v(exception);
-      Logger().v('Here we are dude');
+
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
-        print(jsonResponse);
-        throw SomethingWentWrong(errorResponseModel.statusMessage);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
+        Logger().w(jsonResponse);
+        throw SomethingWentWrong(errorResponseModel.body[0]);
       }
     }
   }
@@ -162,9 +166,6 @@ class AuthDataSourceImp implements AuthDataSource {
     String url = AppUrl.baseUrl + AppUrl.logoutUrl;
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
 
-    print(jsonEncode(params));
-    print('this is the jsonEncode  ${jsonEncode(params)}');
-    print('this is the encryptedjson request $encryptedJson');
 
     try {
       final response = await dio.post(
@@ -189,9 +190,11 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
         print(jsonResponse);
         throw SomethingWentWrong(errorResponseModel.statusMessage);
       }
@@ -199,7 +202,8 @@ class AuthDataSourceImp implements AuthDataSource {
   }
 
   @override
-  Future<ResetPasswordResponseModel> resetPassword(ResetPasswordRequestModel params) async {
+  Future<ResetPasswordResponseModel> resetPassword(
+      ResetPasswordRequestModel params) async {
     String url = AppUrl.baseUrl + AppUrl.resetUrl;
 
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
@@ -219,9 +223,11 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
         throw SomethingWentWrong(errorResponseModel.statusMessage);
       }
     }
@@ -250,18 +256,21 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
         throw SomethingWentWrong(errorResponseModel.statusMessage);
       }
     }
   }
 
   @override
-  Future<ValidateOtpResponseModel> validateOtp(ValidateOtpRequestModel params) async {
+  Future<ValidateOtpResponseModel> validateOtp(
+      ValidateOtpRequestModel params) async {
     String url = AppUrl.baseUrl + AppUrl.validateOtpUrl;
-
+    print(jsonEncode(params));
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
 
     print({'Text': encryptedJson});
@@ -275,7 +284,7 @@ class AuthDataSourceImp implements AuthDataSource {
       var decryptedResponse = Encryption.decryptObject(response.data['Text']);
       var jsonResponse = jsonDecode(decryptedResponse);
 
-      print(jsonResponse);
+      print('otp $jsonResponse');
 
       if (response.statusCode == 200 && jsonResponse['StatusCode'] == '200') {
         return ValidateOtpResponseModel.fromJson(jsonResponse);
@@ -286,10 +295,12 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
-        throw SomethingWentWrong(errorResponseModel.statusMessage);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
+        throw SomethingWentWrong(errorResponseModel.body[0]);
       }
     }
   }
@@ -297,6 +308,7 @@ class AuthDataSourceImp implements AuthDataSource {
   @override
   Future<NoParams> generateOtp(GenerateOtpRequestModel params) async {
     String url = AppUrl.baseUrl + AppUrl.generateOtpUrl;
+    Logger().w(params);
 
     String encryptedJson = Encryption.encryptObject(jsonEncode(params));
     try {
@@ -314,9 +326,11 @@ class AuthDataSourceImp implements AuthDataSource {
       if (exception.type == DioErrorType.connectTimeout) {
         throw TimeoutException(AppMessages.timeOut);
       } else {
-        var decryptedResponse = Encryption.decryptObject(exception.response?.data['Text']);
+        var decryptedResponse =
+            Encryption.decryptObject(exception.response?.data['Text']);
         var jsonResponse = jsonDecode(decryptedResponse);
-        ErrorResponseModel errorResponseModel = ErrorResponseModel.fromJson(jsonResponse);
+        ErrorResponseModel errorResponseModel =
+            ErrorResponseModel.fromJson(jsonResponse);
         throw SomethingWentWrong(errorResponseModel.statusMessage);
       }
     }

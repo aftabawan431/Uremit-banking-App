@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class ValidateBankResponseModel extends Equatable {
-  ValidateBankResponseModel({
+  const ValidateBankResponseModel({
     required this.StatusCode,
     required this.StatusMessage,
     required this.TraceId,
@@ -31,12 +31,18 @@ class ValidateBankResponseModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        StatusCode,
+        StatusMessage,
+        TraceId,
+        validateBankResponseModelBody,
+      ];
 }
 
 class ValidateBankResponseModelBody extends Equatable {
-  ValidateBankResponseModelBody({
+  const ValidateBankResponseModelBody({
     required this.branchCode,
+    required this.bankCode,
     required this.branchName,
     required this.city,
     required this.cnic,
@@ -44,26 +50,29 @@ class ValidateBankResponseModelBody extends Equatable {
     required this.errors,
   });
   final String branchCode;
+  final String bankCode;
   final String branchName;
   final String city;
   final String cnic;
   final String titleOfAccount;
-  final String errors;
+  final List<dynamic> errors;
 
   factory ValidateBankResponseModelBody.fromJson(Map<String, dynamic> json) {
     return ValidateBankResponseModelBody(
       branchCode: json['branchCode'],
+      bankCode: json['bankCode'],
       branchName: json['branchName'],
       city: json['city'],
       cnic: json['cnic'],
-      titleOfAccount: json['titleOfAccount'],
-      errors: json['errors'],
+      titleOfAccount: json['titleOfAccount']??'',
+      errors: List.castFrom<dynamic, dynamic>(json['errors']),
     );
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['branchCode'] = branchCode;
+    _data['bankCode'] = bankCode;
     _data['branchName'] = branchName;
     _data['city'] = city;
     _data['cnic'] = cnic;
@@ -71,4 +80,7 @@ class ValidateBankResponseModelBody extends Equatable {
     _data['errors'] = errors;
     return _data;
   }
+
+  @override
+  List<Object?> get props => [branchCode, bankCode, branchName, city, cnic, titleOfAccount, errors];
 }

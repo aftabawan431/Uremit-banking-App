@@ -2,6 +2,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:uremit/services/error/failure.dart';
 
 import '../constants/app_level/app_messages.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 /// Abstract Class for providing network info
 /// [isConnected] method is used for testing

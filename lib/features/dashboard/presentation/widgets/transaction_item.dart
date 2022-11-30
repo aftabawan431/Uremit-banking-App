@@ -6,13 +6,13 @@ import 'package:uremit/features/dashboard/models/get_transaction_list_response_m
 import 'package:uremit/features/dashboard/presentation/manager/dashboard_view_model.dart';
 import 'package:uremit/features/dashboard/presentation/widgets/transaction_details.dart';
 import 'package:uremit/features/dashboard/presentation/widgets/transaction_tree.dart';
+import 'package:uremit/features/dashboard/presentation/widgets/update_pending_transaction.dart';
 
 import '../../../../app/widgets/clippers/payment_details_clipper.dart';
 import '../../../../utils/constants/app_level/app_assets.dart';
 
-class TransactionItem extends StatelessWidget {
-  TransactionItem({Key? key}) : super(key: key);
-  ValueNotifier<int> selectedTab = ValueNotifier(1);
+class TransactionsListItem extends StatelessWidget {
+  TransactionsListItem({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +27,17 @@ class TransactionItem extends StatelessWidget {
               ),
             );
           }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (int index = 0; index < value.length; index++)
-                ExpansionTile(
+          return ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: value.length,
+              itemBuilder: (_, index) {
+                ValueNotifier<int> selectedTab = ValueNotifier(1);
+                return ExpansionTile(
                   leading: CircleAvatar(
                     radius: 20.r,
-                    backgroundImage: const AssetImage(AppAssets.transactionPlaceholderPng),
+                    backgroundImage:
+                        const AssetImage(AppAssets.transactionPlaceholderPng),
                   ),
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,15 +48,22 @@ class TransactionItem extends StatelessWidget {
                           children: [
                             Text(
                               value[index].receiverName,
-                              style: Theme.of(context).textTheme.subtitle2?.copyWith(color: Colors.white),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2
+                                  ?.copyWith(color: Colors.white),
                             ),
-                            Text(value[index].date, style: Theme.of(context).textTheme.caption),
+                            Text(value[index].date,
+                                style: Theme.of(context).textTheme.caption),
                           ],
                         ),
                       ),
                       Text(
-                        '\$${value[index].amount.toString()}',
-                        style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
+                        '\$${value[index].sendingAmount.toString()}',
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle1
+                            ?.copyWith(color: Colors.white),
                       ),
                     ],
                   ),
@@ -64,7 +74,8 @@ class TransactionItem extends StatelessWidget {
                       clipper: PaymentDetailsClipper(),
                       child: Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 14.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 22.w, vertical: 14.h),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20.r),
                           gradient: const LinearGradient(
@@ -91,10 +102,12 @@ class TransactionItem extends StatelessWidget {
                                 activeFgColor: Colors.white,
                                 dividerColor: Colors.white,
                                 fontSize: 11.sp,
-                                activeBgColor: const [Colors.transparent, Colors.transparent],
+                                activeBgColor: const [
+                                  Colors.transparent,
+                                  Colors.transparent
+                                ],
                                 onToggle: (index) {
                                   selectedTab.value = index!;
-                                  print('switched to: $index');
                                 },
                               ),
                             ),
@@ -106,9 +119,14 @@ class TransactionItem extends StatelessWidget {
                                   return AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 200),
                                     child: selectedIndex == 0
-                                        ? TreeDesign(
-                                            statusList: value[index].statusList,
-                                          )
+                                        ? value[index].status == 'Requested'
+                                            ? UpdatePendingTransaction(
+                                                transaction: value[index],
+                                              )
+                                            : TreeDesign(
+                                                statusList:
+                                                    value[index].statusList,
+                                              )
                                         : TransactionDetails(
                                             transaction: value[index],
                                           ),
@@ -121,12 +139,8 @@ class TransactionItem extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              SizedBox(
-                height: 80.h,
-              )
-            ],
-          );
+                );
+              });
         });
   }
 }

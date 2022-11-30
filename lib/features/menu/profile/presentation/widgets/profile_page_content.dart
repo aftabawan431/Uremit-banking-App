@@ -30,8 +30,9 @@ class _ProfilePageContentState extends State<ProfilePageContent> {
 
   getValues() async {
     await context.read<ProfileViewModel>().getProfile();
-    context.read<UpdateProfileViewModel>().loadProfileData(context.read<ProfileViewModel>().profileDetails);
     await context.read<UpdateProfileViewModel>().getCountries();
+
+    context.read<UpdateProfileViewModel>().loadProfileData(context.read<ProfileViewModel>().profileDetails);
     Timer(const Duration(milliseconds: 400), () {
       context.read<UpdateProfileViewModel>().nationalityCountry = context
           .read<UpdateProfileViewModel>()
@@ -57,7 +58,7 @@ class _ProfilePageContentState extends State<ProfilePageContent> {
             );
           }
           if (context.read<ProfileViewModel>().profileDetails == null) {
-            return Center(child: Text('Something Went Wrong!', style: Theme.of(context).textTheme.caption));
+            return Center(child: Text('No Profile Details Exists', style: Theme.of(context).textTheme.caption));
           }
           return Column(
             children: [

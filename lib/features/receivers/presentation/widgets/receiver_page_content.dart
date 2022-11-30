@@ -34,7 +34,7 @@ class _ReceiverPageContentState extends State<ReceiverPageContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: const CustomAppBar(title: 'Dashboard'),
+      appBar: const CustomAppBar(title: 'Receivers'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,6 +51,11 @@ class _ReceiverPageContentState extends State<ReceiverPageContent> {
                   sigma: 10,
                   child: GestureDetector(
                     onTap: () {
+                      ReceiverViewModel receiverViewModel = sl();
+                      receiverViewModel.isPaymentReceiver = false;
+
+                      print(receiverViewModel.isPaymentReceiver);
+
                       AppState appState = sl();
                       appState.currentAction = PageAction(state: PageState.addPage, page: PageConfigs.addReceiverPageConfig);
                     },

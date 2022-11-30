@@ -14,7 +14,8 @@ import '../../../../services/error/failure.dart';
 import '../../../../utils/router/app_state.dart';
 
 class CardsViewModel extends ChangeNotifier {
-  CardsViewModel({required this.getAllCardsUsecase, required this.deleteCardUsecase});
+  CardsViewModel(
+      {required this.getAllCardsUsecase, required this.deleteCardUsecase});
 
   // Usecases
   GetAllCardsUsecase getAllCardsUsecase;
@@ -28,7 +29,6 @@ class CardsViewModel extends ChangeNotifier {
   // Properties
   GetAllCardsResponseModel? allCards;
 
-
   final TextEditingController cardController = TextEditingController();
   AllCardsBody? selectedCard;
   late String cardId;
@@ -38,15 +38,16 @@ class CardsViewModel extends ChangeNotifier {
   AccountProvider get _accountProvider => sl();
 
   // Usecase Calls
-  Future<void> getAllCards({bool reCall=false}) async {
-    if(allCards!=null&&allCards!.allCardsBody.isNotEmpty){
-      if(reCall==false){
+  Future<void> getAllCards({bool reCall = false}) async {
+    if (allCards != null && allCards!.allCardsBody.isNotEmpty) {
+      if (reCall == false) {
         return;
       }
     }
     isLoadingNotifier.value = true;
 
-    var getAllCardsEither = await getAllCardsUsecase.call(GetAllCardsRequestModel(_accountProvider.userDetails!.userDetails.id));
+    var getAllCardsEither = await getAllCardsUsecase.call(
+        GetAllCardsRequestModel(_accountProvider.userDetails!.userDetails.id));
 
     if (getAllCardsEither.isLeft()) {
       handleError(getAllCardsEither);
@@ -55,24 +56,27 @@ class CardsViewModel extends ChangeNotifier {
     } else if (getAllCardsEither.isRight()) {
       getAllCardsEither.foldRight(null, (response, _) {
         allCards = response;
-        if(allCards!.allCardsBody.isNotEmpty){
-          selectedCard=allCards!.allCardsBody.first;
-          cardController.text=selectedCard!.maskedNumber;
+        if (allCards!.allCardsBody.isNotEmpty) {
+          selectedCard = allCards!.allCardsBody.first;
+          cardController.text = selectedCard!.maskedNumber;
         }
       });
       isLoadingNotifier.value = false;
     }
   }
-  void emptyList(){
-    allCards=null;
-    selectedCard=null;
+
+  void emptyList() {
+    allCards = null;
+    selectedCard = null;
     cardController.clear();
   }
 
-  Future<void> deleteCard({required String id, required BuildContext context}) async {
+  Future<void> deleteCard(
+      {required String id, required BuildContext context}) async {
     isDeleteLoadingNotifier.value = true;
 
-    var deleteCardEither = await deleteCardUsecase.call(DeleteCardRequestModel(id: id));
+    var deleteCardEither =
+        await deleteCardUsecase.call(DeleteCardRequestModel(id: id));
     isDeleteLoadingNotifier.value = false;
 
     Navigator.of(context).pop();
@@ -82,12 +86,15 @@ class CardsViewModel extends ChangeNotifier {
     } else if (deleteCardEither.isRight()) {
       deleteCardEither.foldRight(null, (response, _) {
         if (response.deleteCardResponseModelBody == 'True') {
-          onErrorMessage?.call(OnErrorMessageModel(message: 'Card deleted successfully', backgroundColor: Colors.green));
+          onErrorMessage?.call(OnErrorMessageModel(
+              message: 'Card deleted successfully',
+              backgroundColor: Colors.green));
         } else {
-          onErrorMessage?.call(OnErrorMessageModel(message: 'Something went wrong!'));
+          onErrorMessage
+              ?.call(OnErrorMessageModel(message: 'Something went wrong!'));
         }
       });
-      await getAllCards();
+      await getAllCards(reCall: true);
     }
   }
 
@@ -96,7 +103,9 @@ class CardsViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
   // Page Moves

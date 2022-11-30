@@ -1,6 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
+import 'package:uremit/features/payment/payment_details/models/get_receiver_currencies_request_model.dart';
+import 'package:uremit/features/payment/payment_details/models/get_receiver_currencies_response_model.dart';
+import 'package:uremit/features/payment/payment_details/usecase/get_receiver_currencies_usecase.dart';
+import 'package:uremit/features/payment/receipt_screen/presentation/manager/receipt_screen_view_model.dart';
 import 'package:uremit/features/receivers/presentation/manager/receiver_view_model.dart';
 import 'package:uremit/services/models/no_params.dart';
 import 'package:uremit/services/models/on_error_message_model.dart';
@@ -13,14 +19,18 @@ import '../../models/get_rate_lists_response_model.dart';
 import '../../usecase/get_payment_rate_list_usecase.dart';
 
 class PaymentDetailsViewModel extends ChangeNotifier {
-  PaymentDetailsViewModel({required this.getPaymentRateListUsecase});
+  PaymentDetailsViewModel(
+      {required this.getPaymentRateListUsecase,
+      required this.getReceiverCurrenciesUsecase});
 
   // Usecases
   GetPaymentRateListUsecase getPaymentRateListUsecase;
+  GetReceiverCurrenciesUsecase getReceiverCurrenciesUsecase;
 
   // Value Notifiers
   ValueChanged<OnErrorMessageModel>? onErrorMessage;
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isCurrencyLoading = ValueNotifier(false);
   ValueNotifier<bool> isCountryLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isPaymentMethodLoadingNotifier = ValueNotifier(false);
   ValueNotifier<bool> isPayoutPartnerLoadingNotifier = ValueNotifier(false);
@@ -43,7 +53,14 @@ class PaymentDetailsViewModel extends ChangeNotifier {
   final FocusNode receiverCountryFocusNode = FocusNode();
   final String receiverCountryLabelText = 'Receiver Country';
   final String receiverCountryHintText = 'Select Receiver\'s Country';
-  final TextEditingController receiverCountryController = TextEditingController();
+  final TextEditingController receiverCountryController =
+      TextEditingController();
+
+  final FocusNode receiverCurrencyFocusNode = FocusNode();
+  final String receiverCurrencyLabelText = 'Receiver Currency';
+  final String receiverCurrencyHintText = 'Select Receiver\'s Currency';
+  final TextEditingController receiverCurrencyController =
+      TextEditingController();
 
   final FocusNode paymentMethodFocusNode = FocusNode();
   final String paymentMethodLabelText = 'Payment Method';
@@ -63,14 +80,18 @@ class PaymentDetailsViewModel extends ChangeNotifier {
   final FocusNode reasonFocusNode = FocusNode();
 
   final String reasonCountryLabelText = 'Reason';
-  final String reasonHintText = 'Enter Reason (min 20 letters)';
+  final String reasonHintText = 'Enter Reason (min 10 letters)';
   final TextEditingController reasonController = TextEditingController();
   GetPaymentRateListResponseModal? paymentList;
 
   CountryPayment? receiverCountry;
 
   ValueNotifier<PayoutMethod?> receiverPayoutMethod = ValueNotifier(null);
+  ValueNotifier<Currency?> receiverCurrency = ValueNotifier(null);
   ValueNotifier<PayoutPartner?> receiverPayoutPartner = ValueNotifier(null);
+
+  GetReceiverCurrenciesResponseModel? getReceiverCurrenciesResponseModel;
+
   // Getters
   AppState appState = GetIt.I.get<AppState>();
   PaymentDetailsViewModel get paymentDetailsViewModel => sl();
@@ -100,6 +121,24 @@ class PaymentDetailsViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> getReceiverCurrencies(String id) async {
+    isCurrencyLoading.value = true;
+    final params = GetReceiverCurrenciesRequestModel(id: id);
+
+    var getRateListEither = await getReceiverCurrenciesUsecase(params);
+    if (getRateListEither.isLeft()) {
+      handleError(getRateListEither);
+      isCurrencyLoading.value = false;
+    } else if (getRateListEither.isRight()) {
+      getRateListEither.foldRight(null, (response, _) {
+        getReceiverCurrenciesResponseModel = response;
+      });
+      isCurrencyLoading.value = false;
+
+      //
+    }
+  }
+
   /// extract payout partners
   ///
   ///
@@ -116,7 +155,8 @@ class PaymentDetailsViewModel extends ChangeNotifier {
       return;
     }
     for (var item in paymentList!.getPaymentRateListResponseBody) {
-      if (item.country.name == receiverCountry!.name && item.payoutMethod.name == receiverPayoutMethod.value!.name) {
+      if (item.country.name == receiverCountry!.name &&
+          item.payoutMethod.name == receiverPayoutMethod.value!.name) {
         if (!payoutPartnersList.contains(item.payoutPartner)) {
           payoutPartnersList.add(item.payoutPartner);
         }
@@ -150,8 +190,12 @@ class PaymentDetailsViewModel extends ChangeNotifier {
   }
 
   double getExchageRate() {
-    var object = paymentList!.getPaymentRateListResponseBody.firstWhere((element) => element.payoutMethod.id == receiverPayoutMethod.value!.id);
-    return object.exchangeRate.toDouble();
+    ReceiptScreenViewModel viewModel = sl();
+    if (viewModel.selectedPaymentMethod.value == null) {
+      return 0;
+    }
+
+    return viewModel.selectedPaymentMethod.value!.exchangeRate;
   }
 
   /// extract unique objects from list of countries
@@ -162,7 +206,9 @@ class PaymentDetailsViewModel extends ChangeNotifier {
     }
 
     for (var item in paymentList!.getPaymentRateListResponseBody) {
-      if (countriesList.where((element) => element.country.name == item.country.name).isEmpty) {
+      if (countriesList
+          .where((element) => element.country.name == item.country.name)
+          .isEmpty) {
         countriesList.add(item);
       }
     }
@@ -177,7 +223,8 @@ class PaymentDetailsViewModel extends ChangeNotifier {
 
     isCountryLoadingNotifier.value = true;
 
-    var getReceiverCountriesEither = await getPaymentRateListUsecase.call(NoParams());
+    var getReceiverCountriesEither =
+        await getPaymentRateListUsecase.call(NoParams());
 
     if (getReceiverCountriesEither.isLeft()) {
       handleError(getReceiverCountriesEither);
@@ -197,15 +244,20 @@ class PaymentDetailsViewModel extends ChangeNotifier {
     sendMoneyController.clear();
     paymentMethodController.clear();
     receiverCountryController.clear();
+    receiverCurrencyController.clear();
     payoutPartnerController.clear();
-    receiverPayoutMethod.value=null;
-    receiverPayoutPartner.value=null;
-    ReceiverViewModel receiverViewModel=sl();
-    receiverViewModel.selectedReceiver.value=null;
-
+    receiverPayoutMethod.value = null;
+    receiverPayoutPartner.value = null;
+    receiverCurrency.value = null;
+    ReceiverViewModel receiverViewModel = sl();
+    receiverViewModel.selectedReceiver.value = null;
   }
 
   void onReceiverCountrySubmitted(BuildContext context) {
+    FocusScope.of(context).requestFocus(receiverCurrencyFocusNode);
+  }
+
+  void onReceiverCurrencySubmitted(BuildContext context) {
     FocusScope.of(context).requestFocus(paymentMethodFocusNode);
   }
 
@@ -238,7 +290,27 @@ class PaymentDetailsViewModel extends ChangeNotifier {
     return result;
   }
 
+  String? validateReceiverCurrency(String? value) {
+    if (!isPaymentDetailsPageChange) {
+      return null;
+    }
+    isReceiverCountryError = true;
+    var result = FormValidators.validateCurrency(value?.trim());
+    print(result);
+    if (result == null) {
+      isReceiverCountryError = false;
+    }
+    return result;
+  }
+
   void onReceiverCountryChange(String value) {
+    isPaymentDetailsPageChange = false;
+    if (isReceiverCountryError) {
+      paymentDetailsFormKey.currentState!.validate();
+    }
+  }
+
+  void onReceiverCurrencyChange(String value) {
     isPaymentDetailsPageChange = false;
     if (isReceiverCountryError) {
       paymentDetailsFormKey.currentState!.validate();
@@ -250,7 +322,7 @@ class PaymentDetailsViewModel extends ChangeNotifier {
       return null;
     }
     isPaymentMethodError = true;
-    var result = FormValidators.validateCountry(value?.trim());
+    var result = FormValidators.validatePaymentMethod(value?.trim());
     if (result == null) {
       isPaymentMethodError = false;
     }
@@ -329,7 +401,9 @@ class PaymentDetailsViewModel extends ChangeNotifier {
   // Error Handling
   void handleError(Either<Failure, dynamic> either) {
     isLoadingNotifier.value = false;
-    either.fold((l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)), (r) => null);
+    either.fold(
+        (l) => onErrorMessage?.call(OnErrorMessageModel(message: l.message)),
+        (r) => null);
   }
 
 // Page Moves

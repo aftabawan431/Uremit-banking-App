@@ -19,7 +19,7 @@ import '../../../../../app/providers/account_provider.dart';
 import '../../../../../services/error/failure.dart';
 import '../../../../../services/models/no_params.dart';
 import '../../../../../utils/constants/enums/attachment_type.dart';
-import '../../../../../utils/globals/app_globals.dart';
+import '../../../../../utils/globals/app_globals.dart' as data;
 import '../../../../../utils/router/app_state.dart';
 import '../../../../../utils/validators/form_validator.dart';
 import '../../../../files/previous_files/presentation/manager/previous_files_view_model.dart';
@@ -110,13 +110,13 @@ class DocumentsViewModel extends ChangeNotifier {
     isDocsLoadingNotifier.value = true;
 
     var params = DocumentRequiredRequestModel(
-        id: requiredDocId,
+        id: data.requiredDocId,
         frontFileName: frontSideController.text,
         backFileName: backSideController.text,
         docNumber: documentRemarksController.text,
         frontPath: ''.toString(),
         backPath: ''.toString(),
-        attachmentTypeId: requiredDocAttachmentId,
+        attachmentTypeId: data.requiredDocAttachmentId,
         documentType: documentTypeController.text,
         userId: _accountProvider.userDetails!.userDetails.id.toString(),
         createdBy: ''.toString(),
@@ -142,6 +142,7 @@ class DocumentsViewModel extends ChangeNotifier {
         docRequiredEither.foldRight(null, (response, _) {
           isDocsLoadingNotifier.value = false;
           onErrorMessage?.call(OnErrorMessageModel(message: 'Successful', backgroundColor: Colors.green));
+          clearFields();
           RequiredFilesViewModel reqFileViewModal = sl();
           PreviousFilesViewModel previousFilesViewModel = sl();
           reqFileViewModal.isLoadingNotifier.value = true;

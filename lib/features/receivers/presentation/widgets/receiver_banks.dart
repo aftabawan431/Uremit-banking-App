@@ -5,16 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:simple_shadow/simple_shadow.dart';
 import 'package:uremit/app/widgets/bottom_sheets/add_new_bank_bottom_sheet.dart';
 import 'package:uremit/features/receivers/models/receiver_list_response_model.dart';
-import 'package:uremit/utils/router/uremit_router_delegate.dart';
 
 import '../../../../app/widgets/bottom_sheets/delete_receiver_info_bottom_sheet.dart';
+import '../../../../utils/router/uremit_router_delegate.dart';
 import '../manager/receiver_view_model.dart';
 
 class ReceiverBanks extends StatelessWidget {
-  const ReceiverBanks({required this.receiverBanks, required this.countryId, Key? key}) : super(key: key);
+  const ReceiverBanks({required this.receiverBanks, required this.countryName, required this.receiverId, required this.countryId, Key? key}) : super(key: key);
 
   final List<ReceiverBank> receiverBanks;
   final String countryId;
+  final String receiverId;
+  final String countryName;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,9 @@ class ReceiverBanks extends StatelessWidget {
               sigma: 5,
               child: GestureDetector(
                 onTap: () {
-                  AddBankBottomSheet bottomSheet = AddBankBottomSheet(context: context, isDeleteReceiver: false, countryId: countryId);
+                  context.read<ReceiverViewModel>().clearAddBankInfo();
+                  AddBankBottomSheet bottomSheet =
+                      AddBankBottomSheet(context: context, isDeleteReceiver: false, countryId: countryId, countryName: countryName, receiverId: receiverId);
                   context.read<ReceiverViewModel>().getBanksList(countryId);
                   globalHomeContext = context;
                   bottomSheet.show();

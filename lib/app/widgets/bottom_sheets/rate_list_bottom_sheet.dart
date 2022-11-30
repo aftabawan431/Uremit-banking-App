@@ -89,7 +89,7 @@ class RateListBottomSheet {
                                           context.read<RatesViewModel>().rateList?.rateListBody[index].country.name ?? '';
 
                                       context.read<RatesViewModel>().exchangeRateNotifier.value =
-                                          '${context.read<RatesViewModel>().rateList?.rateListBody[index].exchangeRate ?? ''} ${context.read<RatesViewModel>().rateList?.rateListBody[index].country.currency.toUpperCase()}';
+                                          '${context.read<RatesViewModel>().rateList?.rateListBody[index].exchangeRate.toStringAsFixed(2) ?? ''} ${context.read<RatesViewModel>().rateList?.rateListBody[index].country.currency.toUpperCase()}';
 
                                       context.read<RatesViewModel>().destinationNationCurrencyNotifier.value =
                                           context.read<RatesViewModel>().rateList?.rateListBody[index].country.currency.toUpperCase() ?? '';

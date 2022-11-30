@@ -13,27 +13,35 @@ class ReceiverInfoPageContent extends StatefulWidget {
   const ReceiverInfoPageContent({Key? key}) : super(key: key);
 
   @override
-  _ReceiverInfoPageContentState createState() => _ReceiverInfoPageContentState();
+  _ReceiverInfoPageContentState createState() =>
+      _ReceiverInfoPageContentState();
 }
 
 class _ReceiverInfoPageContentState extends State<ReceiverInfoPageContent> {
   @override
   void initState() {
-    context.read<ReceiverInfoViewModel>().onErrorMessage = (value) => context.show(message: value.message, backgroundColor: value.backgroundColor);
+    context.read<ReceiverInfoViewModel>().onErrorMessage = (value) => context
+        .show(message: value.message, backgroundColor: value.backgroundColor);
     super.initState();
+    context.read<ReceiverInfoViewModel>().status.value = false;
+    context.read<ReceiverInfoViewModel>().clearAddReceiverInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ValueListenableBuilder<bool>(
-          valueListenable: context.read<ReceiverInfoViewModel>().receiverInfoViewModel.isLoadingNotifier,
+          valueListenable: context
+              .read<ReceiverInfoViewModel>()
+              .receiverInfoViewModel
+              .isLoadingNotifier,
           builder: (_, value, __) {
             if (value) {
               return Center(
                 child: CircularProgressIndicator.adaptive(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor),
                 ),
               );
             }
@@ -46,13 +54,16 @@ class _ReceiverInfoPageContentState extends State<ReceiverInfoPageContent> {
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: ExpandablePageView(
-                      controller: context.read<ReceiverInfoViewModel>().pageController,
+                      controller:
+                          context.read<ReceiverInfoViewModel>().pageController,
                       physics: const BouncingScrollPhysics(),
                       animationDuration: const Duration(milliseconds: 500),
                       animateFirstPage: true,
                       scrollDirection: Axis.horizontal,
-                      // onPageChanged: context.read<ProfileInfoViewModel>().onPageChange,
+                      onPageChanged:
+                          context.read<ReceiverInfoViewModel>().onPageChange,
                       children: const [
+
                         ReceiverInfo(),
                         ReceiverBankInfo(),
                       ],
@@ -62,7 +73,8 @@ class _ReceiverInfoPageContentState extends State<ReceiverInfoPageContent> {
                 SizedBox(
                   height: 40.h,
                   child: SmoothPageIndicator(
-                    controller: context.read<ReceiverInfoViewModel>().pageController,
+                    controller:
+                        context.read<ReceiverInfoViewModel>().pageController,
                     count: 2,
                     effect: ScrollingDotsEffect(
                       dotHeight: 10,

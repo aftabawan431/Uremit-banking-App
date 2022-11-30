@@ -46,8 +46,10 @@ class ReceiverListBody extends Equatable {
     required this.mobileNumber,
     required this.iso,
     required this.countryId,
+    required this.countryName,
     required this.svgPath,
     required this.banks,
+    required this.relationship,
   });
 
   final String receiverId;
@@ -56,9 +58,11 @@ class ReceiverListBody extends Equatable {
   final String lastName;
   final String nickName;
   final String email;
+  final String relationship;
   final String mobileNumber;
   final String iso;
   final String countryId;
+  final String countryName;
   final String svgPath;
   final List<ReceiverBank> banks;
 
@@ -70,9 +74,11 @@ class ReceiverListBody extends Equatable {
       lastName: json['lastName'],
       nickName: json['nickName'] ?? 'N/A',
       email: json['email'] ?? 'N/A',
+      relationship: json['relationship'] ?? 'N/A',
       mobileNumber: json['mobileNumber'],
       iso: json['iso'],
       countryId: json['countryId'],
+      countryName: json['countryName'],
       svgPath: json['svgPath'],
       banks: List.from(json['banks']).map((e) => ReceiverBank.fromJson(e)).toList(),
     );
@@ -85,17 +91,19 @@ class ReceiverListBody extends Equatable {
     _data['middleName'] = middleName;
     _data['lastName'] = lastName;
     _data['nickName'] = nickName;
+    _data['relationship'] = relationship;
     _data['email'] = email;
     _data['mobileNumber'] = mobileNumber;
     _data['iso'] = iso;
     _data['countryId'] = countryId;
+    _data['countryName'] = countryName;
     _data['svgPath'] = svgPath;
     _data['banks'] = banks.map((e) => e.toJson()).toList();
     return _data;
   }
 
   @override
-  List<Object?> get props => [receiverId, firstName, middleName, lastName, nickName, email, mobileNumber, iso, countryId, banks, svgPath];
+  List<Object?> get props => [receiverId, firstName, countryName, middleName, lastName, nickName, email, mobileNumber, iso, countryId, banks, svgPath];
 }
 
 class ReceiverBank extends Equatable {

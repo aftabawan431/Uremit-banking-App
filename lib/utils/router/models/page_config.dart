@@ -34,4 +34,5 @@ class PageConfigs {
       const PageConfiguration(key: PageKeys.interactiveHeroPageScreenPageKey, path: PagePaths.interactiveHeroPageScreenPagePath, uiPage: Pages.interactiveHeroPageScreen);
   static PageConfiguration summaryDetailsScreenPageConfig =
       const PageConfiguration(key: PageKeys.summaryDetailsScreenPageKey, path: PagePaths.summaryDetailsScreenPagePath, uiPage: Pages.summaryDetailsScreen);
+  static PageConfiguration webViewPageConfig = const PageConfiguration(key: PageKeys.webViewPageKey, path: PagePaths.webViewPagePath, uiPage: Pages.webViewPage);
 }

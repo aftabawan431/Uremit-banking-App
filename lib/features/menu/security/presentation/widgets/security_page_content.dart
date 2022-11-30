@@ -6,9 +6,11 @@ import 'package:uremit/app/widgets/bottom_sheets/change_password_bottom_sheet.da
 import 'package:uremit/features/menu/security/presentation/manager/security_view_model.dart';
 import 'package:uremit/utils/extensions/extensions.dart';
 
+import '../../../../../app/globals.dart';
 import '../../../../../app/widgets/customs/continue_button.dart';
 import '../../../../../app/widgets/customs/custom_form_field.dart';
 import '../../../../../utils/constants/app_level/app_assets.dart';
+import '../../../account_wrapper/presentation/manager/account_wrapper_view_model.dart';
 
 class SecurityPageContent extends StatefulWidget {
   const SecurityPageContent({Key? key}) : super(key: key);
@@ -100,6 +102,7 @@ class _SecurityPageContentState extends State<SecurityPageContent> {
                 ContinueButton(
                   text: 'Update',
                   onPressed: () async {
+                    FocusScope.of(context).unfocus();
                     context.read<SecurityViewModel>().isUpdateButtonPressed = true;
                     if (!context.read<SecurityViewModel>().securityFormKey.currentState!.validate()) {
                       return;
@@ -110,7 +113,11 @@ class _SecurityPageContentState extends State<SecurityPageContent> {
                 ),
                 SizedBox(height: 16.h),
                 OutlinedButton(
-                  onPressed: context.read<SecurityViewModel>().clearFields,
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    AccountWrapperViewModel provider = sl();
+                    provider.bottomNavigationKey.currentState!.setPage(0);
+                  },
                   child: Text('Cancel', style: Theme.of(context).textTheme.button?.copyWith(color: Theme.of(context).primaryColor)),
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size(double.infinity, 48.h),

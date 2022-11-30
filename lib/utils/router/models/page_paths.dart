@@ -19,4 +19,5 @@ class PagePaths {
   static const String addReceiverInfoPagePath = '/add-receiver-info-page-path';
   static const String interactiveHeroPageScreenPagePath = '/hero-image-page-path';
   static const String summaryDetailsScreenPagePath = '/summary-details-page-path';
+  static const String webViewPagePath = '/web-view-page-path';
 }

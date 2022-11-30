@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:logger/logger.dart';
 
 class GetPaymentRateListResponseModal extends Equatable {
   const GetPaymentRateListResponseModal({
@@ -14,7 +13,6 @@ class GetPaymentRateListResponseModal extends Equatable {
   final List<GetPaymentRateListResponseBody> getPaymentRateListResponseBody;
 
   factory GetPaymentRateListResponseModal.fromJson(Map<String, dynamic> json) {
-
     return GetPaymentRateListResponseModal(
       statusCode: json['StatusCode'],
       statusMessage: json['StatusMessage'],
@@ -54,8 +52,6 @@ class GetPaymentRateListResponseBody extends Equatable {
   final double exchangeRate;
 
   factory GetPaymentRateListResponseBody.fromJson(Map<String, dynamic> json) {
-
-
     return GetPaymentRateListResponseBody(
         country: CountryPayment.fromJson(json['country']),
         payoutMethod: PayoutMethod.fromJson(json['payoutMethod']),
@@ -104,7 +100,7 @@ class CountryPayment extends Equatable {
       currency: json['currency'],
       name: json['name'],
       phoneCode: json['phoneCode'],
-      svgPath: json['svgPath']==null?'':json['svgPath'],
+      svgPath: json['svgPath'] == null ? '' : json['svgPath'],
     );
   }
 
@@ -138,13 +134,13 @@ class PayoutMethod extends Equatable {
   });
   final String id;
   final String name;
-  final int fee;
+  final double fee;
 
   factory PayoutMethod.fromJson(Map<String, dynamic> json) {
     return PayoutMethod(
       id: json['id'],
       name: json['name'],
-      fee: (json['fee'] as num).toInt(),
+      fee: (json['fee'] as num).toDouble(),
     );
   }
 
@@ -172,13 +168,13 @@ class PayoutPartner extends Equatable {
   });
   final String id;
   final String name;
-  final int fee;
+  final double fee;
 
   factory PayoutPartner.fromJson(Map<String, dynamic> json) {
     return PayoutPartner(
       id: json['id'],
       name: json['name'],
-      fee: (json['fee'] as num).toInt(),
+      fee: (json['fee'] as num).toDouble(),
     );
   }
 
